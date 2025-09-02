@@ -1,0 +1,215 @@
+/* CTA Section */
+.cta-section {
+  padding: 100px 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.cta-content {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cta-content.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Main Title */
+.cta-title {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 30px 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Typing Animation Container */
+.cta-typing-container {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: #6c757d;
+  margin: 0 0 50px 0;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 400;
+}
+
+.cta-typing-container .typing-text {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* CTA Buttons Group */
+.cta-buttons-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cta-buttons-group.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.student-btn,
+.mentor-btn {
+  padding: 16px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  min-width: 180px;
+}
+
+.student-btn {
+  background: #000000;
+  color: #ffffff;
+  border: none;
+}
+
+.student-btn:hover {
+  background: #333333;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.mentor-btn {
+  background: transparent;
+  color: #2c3e50;
+  border: 2px solid #e9ecef;
+}
+
+.mentor-btn:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 123, 255, 0.1);
+}
+
+.student-btn:active,
+.mentor-btn:active {
+  transform: translateY(0);
+}
+
+/* Animation Delays */
+.delay-1 {
+  transition-delay: 0.3s;
+}
+
+/* Dark Mode */
+body.dark-mode .cta-section {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+body.dark-mode .cta-title {
+  color: #e9ecef;
+}
+
+body.dark-mode .cta-typing-container,
+body.dark-mode .cta-typing-container .typing-text {
+  color: #adb5bd;
+}
+
+body.dark-mode .student-btn {
+  background: #4dabf7;
+  color: #1a1a1a;
+}
+
+body.dark-mode .student-btn:hover {
+  background: #339af0;
+}
+
+body.dark-mode .mentor-btn {
+  color: #e9ecef;
+  border-color: #495057;
+}
+
+body.dark-mode .mentor-btn:hover {
+  background: #2d2d2d;
+  border-color: #4dabf7;
+  color: #4dabf7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cta-section {
+    padding: 80px 0;
+  }
+  
+  .cta-typing-container {
+    min-height: 50px;
+    margin-bottom: 40px;
+  }
+  
+  .cta-buttons-group {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .student-btn,
+  .mentor-btn {
+    width: 100%;
+    max-width: 280px;
+    padding: 14px 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-section {
+    padding: 60px 0;
+  }
+  
+  .cta-typing-container {
+    min-height: 40px;
+    margin-bottom: 35px;
+  }
+  
+  .student-btn,
+  .mentor-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Performance optimizations */
+.cta-content {
+  will-change: transform, opacity;
+}
+
+.student-btn,
+.mentor-btn {
+  will-change: transform, box-shadow;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .cta-content,
+  .cta-buttons-group {
+    transition: none;
+  }
+  
+  .student-btn,
+  .mentor-btn {
+    transition: none;
+  }
+}

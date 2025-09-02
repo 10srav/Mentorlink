@@ -1,0 +1,201 @@
+/* ===============================
+   Footer Wrapper
+================================ */
+.footer {
+  background: #f8f9fa;
+  padding: 60px 20px 30px;
+  border-top: 1px solid #e9ecef;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===============================
+   Layout
+================================ */
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 50px;
+}
+
+.footer-left {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===============================
+   Logo
+================================ */
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-logo-image {
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.footer-logo-text {
+  font-size: 26px;
+  font-weight: 700;
+  color: #007bff;
+}
+
+.footer-description {
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ===============================
+   Social Media
+================================ */
+.footer-social {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+/* ===============================
+   CTA Button
+================================ */
+.footer-cta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.cta-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.get-started-footer-btn {
+  background: #00d4aa;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.get-started-footer-btn:hover {
+  background: #00b894;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
+}
+
+/* ===============================
+   Right Section (Links)
+================================ */
+.footer-links {
+  flex: 2;
+  min-width: 400px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.footer-column-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #2c3e50;
+}
+
+.footer-link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-link {
+  color: #6c757d;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #007bff;
+}
+
+/* ===============================
+   Bottom Bar
+================================ */
+.footer-bottom {
+  margin-top: 40px;
+  padding-top: 20px;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+  font-size: 13px;
+  color: #777;
+}
+
+/* ===============================
+   Responsive
+================================ */
+@media (max-width: 968px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+  }
+  .footer-links {
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .footer-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

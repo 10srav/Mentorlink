@@ -1,0 +1,153 @@
+/* =========================
+   Student Form Styles
+   ========================= */
+
+/* Container */
+.student-form-container {
+  width: 100%;
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 40px 50px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Heading */
+.student-form-container h2 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #0056D2;
+}
+
+/* Form */
+.student-form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  font-size: 15px;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+/* Inputs + Select */
+.student-form-container input,
+.student-form-container select,
+.student-form-container textarea {
+  padding: 12px 14px;
+  border: 1px solid #d4d4d4;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.student-form-container input:focus,
+.student-form-container select:focus,
+.student-form-container textarea:focus {
+  outline: none;
+  border-color: #0056D2;
+  box-shadow: 0 0 6px rgba(0, 86, 210, 0.4);
+}
+
+/* Radio + Checkbox Groups */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+}
+
+.checkbox-group input {
+  accent-color: #0056D2;
+  cursor: pointer;
+  transform: scale(1.15);
+}
+
+/* Multi-select Dropdown */
+.multi-select {
+  position: relative;
+}
+
+.multi-select select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  appearance: none;
+  background-color: #f9f9f9;
+}
+
+.selected-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.selected-skill {
+  background: #0056D2;
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selected-skill button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Submit Button */
+.student-form-container button {
+  background: #0056D2;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.student-form-container button:hover {
+  background: #0041a8;
+}
+
+/* Error Message */
+.student-form-container .error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 6px;
+}
