@@ -17,10 +17,28 @@ const Signup = () => {
     role: '',
     password: ''
   });
+  const [passwordStrength, setPasswordStrength] = useState({ label: '', color: '#e5e7eb', score: 0 });
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const getPasswordStrength = (pwd) => {
+    let score = 0;
+    if (pwd.length >= 8) score += 1;
+    if (/[A-Z]/.test(pwd)) score += 1;
+    if (/[0-9]/.test(pwd)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
+
+    // Map score to label/color
+    if (score <= 1) return { label: 'Weak', color: '#ef4444', score }; // red
+    if (score === 2) return { label: 'Fair', color: '#f59e0b', score }; // yellow
+    return { label: 'Strong', color: '#10b981', score }; // green
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'password') {
+      setPasswordStrength(getPasswordStrength(value));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -34,11 +52,20 @@ const Signup = () => {
       // Store user ID for OTP verification
       localStorage.setItem('userId', response.userId);
 
-      // Navigate to OTP verification page
-      navigate('/otp');
+      // Save email and role for OTP verification flow
+      localStorage.setItem('signupEmail', formData.email);
+      localStorage.setItem('signupRole', formData.role);
+
+      // Show success and go to OTP verification
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigate('/otp');
+      }, 800);
+
     } catch (error) {
       console.error('Signup error:', error);
-      alert('Signup failed: ' + error.message);
+      alert('Signup failed: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -133,6 +160,29 @@ const Signup = () => {
                 required
               />
             </div>
+            {/* Password strength indicator */}
+            <div style={{ marginTop: 8 }}>
+              <div
+                style={{
+                  height: 8,
+                  background: '#e5e7eb',
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${Math.min(passwordStrength.score, 3) / 3 * 100}%`,
+                    height: '100%',
+                    background: passwordStrength.color,
+                    transition: 'width 200ms ease',
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: 6, fontSize: 12, color: passwordStrength.color }}>
+                {formData.password ? `Strength: ${passwordStrength.label}` : 'Enter a password (8+ chars, uppercase, number, symbol)'}
+              </div>
+            </div>
           </div>
 
           <div className="form-group">
@@ -151,38 +201,21 @@ const Signup = () => {
 
           <div className="form-group">
             <label>Gender*</label>
-            <div className="radio-group">
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="male"
-                  checked={formData.gender === 'male'}
-                  onChange={handleChange}
-                  required
-                />
-                <span className="radio-label">Male</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="female"
-                  checked={formData.gender === 'female'}
-                  onChange={handleChange}
-                />
-                <span className="radio-label">Female</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="other"
-                  checked={formData.gender === 'other'}
-                  onChange={handleChange}
-                />
-                <span className="radio-label">Other</span>
-              </label>
+            <div className="input-with-icon">
+              <FiUser className="input-icon" />
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="gender-select"
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              <FiChevronDown className="select-arrow" />
             </div>
           </div>
 
@@ -210,6 +243,23 @@ const Signup = () => {
           </button>
         </form>
       </div>
+      {showSuccess && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 20,
+            right: 20,
+            background: '#10b981',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: 8,
+            boxShadow: '0 10px 15px rgba(0,0,0,0.1)',
+            zIndex: 9999,
+          }}
+        >
+          Signup successful! Check your email for OTP…
+        </div>
+      )}
     </div>
   );
 };

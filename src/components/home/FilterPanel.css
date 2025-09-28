@@ -1,0 +1,24 @@
+.filter-panel{
+  position: sticky;
+  top: 80px;
+  height: fit-content;
+  background:#f8fafc;
+  border-left:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:16px;
+  width: 280px;
+}
+.filter-panel__title{font-weight:800;font-size:16px;margin-bottom:12px;color:#111827;display:flex;align-items:center;gap:8px}
+.filter-group{margin-bottom:16px}
+.filter-label{font-weight:700;font-size:14px;color:#374151;margin-bottom:6px;display:block}
+.filter-input{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff}
+.chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{background:#e5e7eb;border:none;padding:6px 10px;border-radius:999px;font-weight:600;color:#374151;cursor:pointer}
+.chip--active{background:#1e3a8a;color:#fff}
+
+/* Dark mode */
+body.dark-mode .filter-panel{background:#0f172a;border-color:#334155}
+body.dark-mode .filter-label{color:#e5e7eb}
+body.dark-mode .filter-input{background:#111827;border-color:#334155;color:#e5e7eb}
+body.dark-mode .chip{background:#334155;color:#e5e7eb}
+body.dark-mode .chip--active{background:#2563eb}

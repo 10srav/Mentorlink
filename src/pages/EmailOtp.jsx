@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EmailOtp.css';
 import logoImage from '../assets/mentorlink-logo.png';
+import { userAPI } from '../services/api';
 
 const EmailOtp = () => {
   const [otp, setOtp] = useState(new Array(6).fill(''));
@@ -29,10 +30,41 @@ const EmailOtp = () => {
     }
   };
 
-  const handleContinue = () => {
-    // Add your OTP verification logic here
-    console.log('OTP Entered:', otp.join(''));
-    // navigate('/some-next-page');
+  const handleContinue = async () => {
+    const code = otp.join('');
+    if (code.length !== 6) {
+      alert('Please enter the 6-digit OTP');
+      return;
+    }
+
+    const email = localStorage.getItem('signupEmail');
+    const role = localStorage.getItem('signupRole');
+    const userId = localStorage.getItem('userId');
+
+    if (!email) {
+      alert('Missing email context for verification. Please sign up again.');
+      navigate('/signup');
+      return;
+    }
+
+    try {
+      const res = await userAPI.verifyOTP({ email, otp: code });
+      if (res?.token) {
+        localStorage.setItem('token', res.token);
+      }
+      // Success: route to role-specific form
+      if (role === 'student') {
+        navigate('/student-form', { state: { userId } });
+      } else if (role === 'mentor') {
+        navigate('/mentor-form', { state: { userId } });
+      } else if (role === 'organizer') {
+        navigate('/event-organizer', { state: { userId } });
+      } else {
+        navigate('/home');
+      }
+    } catch (err) {
+      alert(err?.message || 'Invalid or expired OTP');
+    }
   };
 
   const handleResend = () => {

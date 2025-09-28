@@ -1,15 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
 import logo from "../assets/mentorlink-logo.png";
+import { userAPI } from "../services/api";
+
+// Import your images here
+import img1 from "../assets/mentorlink-logo.png";
+import img2 from "../assets/mentorlink-logo.png";
+import img3 from "../assets/mentorlink-logo.png";
 
 const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [currentImage, setCurrentImage] = useState(0);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const images = [img1, img2, img3];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 3000); // Change image every 3 seconds
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/otp");
+    setError("");
+    setLoading(true);
+    try {
+      const data = await userAPI.login({ email, password });
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
+        // Update auth context with user data
+        login(data.user);
+      }
+      // Show success popup for 5-6 seconds then navigate
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigate("/home");
+      }, 5500);
+    } catch (err) {
+      setError(err?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -18,8 +59,12 @@ const Login = () => {
         <div className="login-card">
           {/* Illustration Section */}
           <div className="illustration-section">
-            <div className="image-placeholder">
-              <p>🚀 Animation / Illustration here</p>
+            <div className="image-slider">
+              <img
+                src={images[currentImage]}
+                alt="Login Illustration"
+                className="slider-image"
+              />
             </div>
             <p className="login-caption">Where Guidance meets Opportunity</p>
           </div>
@@ -32,12 +77,12 @@ const Login = () => {
               Welcome to <span className="highlight">MENTOR LINK</span>
             </h3>
 
-            <button className="google-btn">
-              <img
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                alt="Google"
-              />
-              <span>Sign in with Google</span>
+            {/* Use Phone Button instead of Google */}
+            <button
+              className="phone-btn"
+              onClick={() => navigate("/phone-verification")}
+            >
+              📱 Use Phone
             </button>
 
             <div className="divider">or</div>
@@ -46,35 +91,65 @@ const Login = () => {
               <div className="input-container">
                 <input
                   type="email"
-                  placeholder="Sign your email address"
+                  placeholder="Enter your email address"
                   className="login-input"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <a 
-                  href="/phone-verification" 
-                  className="use-phone-link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate('/phone-verification');
-                  }}
-                >
-                  Use Phone
-                </a>
+              </div>
+              <div className="input-container">
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  className="login-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
               </div>
 
-              <button type="submit" className="continue-btn">
-                Continue
+              {error && (
+                <div style={{ color: "#b00020", fontSize: 14, marginBottom: 8 }}>{error}</div>
+              )}
+
+              <button type="submit" className="continue-btn" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
               </button>
             </form>
 
             <p className="signup-text">
-              Don't have an account? <a href="#">Sign up for free!</a>
+              Don't have an account?{" "}
+              <a
+                href="/signup"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/signup");
+                }}
+              >
+                Sign up for free!
+              </a>
             </p>
           </div>
         </div>
       </div>
+      {showSuccess && (
+        <div
+          style={{
+            position: "fixed",
+            top: 20,
+            right: 20,
+            background: "#10b981",
+            color: "white",
+            padding: "12px 16px",
+            borderRadius: 8,
+            boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
+            zIndex: 9999,
+          }}
+        >
+          Login successful! Redirecting...
+        </div>
+      )}
     </div>
   );
 };

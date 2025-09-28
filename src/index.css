@@ -5,11 +5,43 @@
   box-sizing: border-box;
 }
 
+/* Theme variables (light defaults) */
+:root {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --card-background: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #2563eb;
+  --border: #e5e7eb;
+  --success: #16a34a;
+  --danger: #dc2626;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #333;
+  color: var(--text);
+  background: var(--bg);
 }
+
+/* Dark mode variables */
+body.dark-mode {
+  --bg: #071027;
+  --panel: #081424;
+  --card-background: #0b1b2a;
+  --text: #e6eef8;
+  --muted: #9ca3af;
+  --primary: #60a5fa;
+  --border: #102030;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Lightweight element fallbacks (components use variables directly) */
+body.dark-mode .home-navbar { background: var(--panel); }
+body.dark-mode .sidebar { background: var(--panel); }
+body.dark-mode .profile-page-container { background: var(--card-background); }
 
 .container {
   max-width: 1200px;

@@ -1,0 +1,111 @@
+/* OrganizerProfile.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Base layout */
+.app-container {
+  display: flex;
+  min-height: calc(100vh - 64px);
+  background-color: #f5f7fa;
+}
+
+.main-content {
+  flex: 1;
+  padding: 24px;
+  transition: margin 0.3s ease;
+}
+
+/* Ensure the main area sits to the right of the sidebar (sidebar width = 240px) */
+.main-content { 
+  margin-left: 260px; 
+}
+
+/* Top offset so fixed navbar doesn't overlap */
+.organizer-profile .app-container { 
+  padding-top: 72px; 
+}
+
+/* Profile page container */
+.profile-page-container {
+  max-width: 1100px;
+  margin: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  position: relative;
+}
+
+.placeholder-content {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.placeholder-content h1 {
+  color: #333;
+  margin-bottom: 16px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.placeholder-content p {
+  color: #666;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.placeholder-features {
+  margin-top: 40px;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.placeholder-features h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.placeholder-features ul {
+  list-style: none;
+  padding: 0;
+}
+
+.placeholder-features li {
+  color: #666;
+  margin-bottom: 12px;
+  padding-left: 20px;
+  position: relative;
+  font-size: 1rem;
+}
+
+.placeholder-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #0077B5;
+  font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 16px;
+  }
+  
+  .profile-page-container {
+    padding: 16px;
+  }
+  
+  .placeholder-content {
+    padding: 40px 16px;
+  }
+  
+  .placeholder-content h1 {
+    font-size: 1.5rem;
+  }
+}

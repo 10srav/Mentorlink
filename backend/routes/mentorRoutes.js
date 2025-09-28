@@ -5,7 +5,7 @@ const { protect } = require('../middleware/auth');
 const router = express.Router();
 
 // @route   POST /api/mentors
-// @access  Private
-router.post('/', protect, createOrUpdateMentor);
+// @access  Public (temporarily for initial profile creation)
+router.post('/', createOrUpdateMentor);
 
 module.exports = router;

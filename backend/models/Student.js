@@ -48,6 +48,9 @@ const studentSchema = new mongoose.Schema({
   portfolio: {
     type: String,
   },
+  profileImage: {
+    type: String,
+  },
 }, {
   timestamps: true,
 });

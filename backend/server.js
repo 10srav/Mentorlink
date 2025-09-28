@@ -6,8 +6,11 @@ const connectDB = require('./config/db');
 // Load environment variables
 dotenv.config();
 
-// Connect to database
-connectDB();
+// Connect to database unless using file-based DB
+const USE_FILE_DB = String(process.env.USE_FILE_DB || 'false').toLowerCase() === 'true';
+if (!USE_FILE_DB) {
+  connectDB();
+}
 
 const app = express();
 
@@ -19,10 +22,16 @@ app.use(express.json()); // Parse JSON bodies
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/mentors', require('./routes/mentorRoutes'));
 app.use('/api/students', require('./routes/studentRoutes'));
+app.use('/api/organizers', require('./routes/organizerRoutes'));
 
 // Basic route
 app.get('/', (req, res) => {
   res.json({ message: 'MentorLink Backend API' });
+});
+
+// Healthcheck
+app.get('/health', (req, res) => {
+  res.json({ ok: true, useFileDb: USE_FILE_DB });
 });
 
 // Error handling middleware

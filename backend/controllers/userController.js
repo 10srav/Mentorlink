@@ -2,31 +2,111 @@ const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const fileDb = require('../utils/fileDb');
 
-// Generate OTP
+const USE_FILE_DB = String(process.env.USE_FILE_DB || 'false').toLowerCase() === 'true';
+
+// Helpers for file DB mode
+const fileDbGetUserByEmail = (email) => fileDb.findUserByEmail(email);
+const fileDbGetUserByUsername = (username) => fileDb.findUserByUsername(username);
+const fileDbSaveUser = async (user) => fileDb.upsertUser(user);
+
+// Generate a cryptographically strong 6-digit numeric OTP
 const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  let otp = '';
+  for (let i = 0; i < 6; i += 1) {
+    otp += String(crypto.randomInt(0, 10));
+  }
+  return otp;
 };
 
-// Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // App password
-  },
-});
+// Create and cache a single transporter (supports SMTP or Gmail service)
+let cachedTransporter;
+const getTransporter = async () => {
+  if (cachedTransporter) {
+    return cachedTransporter;
+  }
 
-// Send OTP
+  const useSmtp = Boolean(process.env.SMTP_HOST);
+  const baseConfig = useSmtp
+    ? {
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: String(process.env.SMTP_SECURE || 'false').toLowerCase() === 'true',
+        auth: {
+          user: process.env.SMTP_USER || process.env.EMAIL_USER,
+          pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
+        },
+      }
+    : {
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS, // App password
+        },
+      };
+
+  const transporter = nodemailer.createTransport({
+    ...baseConfig,
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 50,
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  try {
+    await transporter.verify();
+  } catch (verifyError) {
+    // Log but do not throw here; allow send to attempt which returns clear error
+    // eslint-disable-next-line no-console
+    console.warn('Email transporter verification failed:', verifyError?.message || verifyError);
+  }
+
+  cachedTransporter = transporter;
+  return cachedTransporter;
+};
+
+// Send OTP email (both text and HTML)
 const sendOTP = async (email, otp) => {
+  const appName = process.env.APP_NAME || 'MentorLink';
+  const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_FROM || process.env.EMAIL_USER;
+  const subject = `OTP for ${appName} Verification`;
+  const text = `Your OTP is: ${otp}. It will expire in 10 minutes.`;
+  const html = `
+    <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;padding:16px;color:#111">
+      <h2 style="margin:0 0 12px 0;font-weight:700;color:#111">${appName} Verification</h2>
+      <p style="margin:0 0 12px 0;color:#444">Use the following One-Time Password (OTP) to continue:</p>
+      <div style="font-size:28px;letter-spacing:6px;font-weight:700;background:#f4f6f8;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;text-align:center;color:#111">${otp}</div>
+      <p style="margin:12px 0 0 0;color:#666">This code expires in 10 minutes.</p>
+      <p style="margin:8px 0 0 0;color:#888;font-size:12px">If you did not request this code, you can safely ignore this email.</p>
+    </div>
+  `;
+
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: fromAddress ? `${appName} <${fromAddress}>` : undefined,
     to: email,
-    subject: 'OTP for MentorLink Verification',
-    text: `Your OTP is: ${otp}. It will expire in 10 minutes.`,
+    subject,
+    text,
+    html,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    if (String(process.env.DEV_DISABLE_EMAIL || 'false').toLowerCase() === 'true') {
+      // eslint-disable-next-line no-console
+      console.log(`[DEV] Email disabled. OTP for ${email}: ${otp}`);
+      return;
+    }
+    const transporter = await getTransporter();
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to send OTP email:', err?.message || err);
+    throw new Error('Failed to send verification email. Please try again later.');
+  }
 };
 
 // @desc    Register user
@@ -41,13 +121,51 @@ const registerUser = async (req, res) => {
   const { name, username, email, mobile, bio, gender, role, password } = req.body;
 
   try {
-    // Check if user exists
+    if (USE_FILE_DB) {
+      // File DB flow
+      const emailExists = fileDbGetUserByEmail(email);
+      const usernameExists = fileDbGetUserByUsername(username);
+      if (emailExists || usernameExists) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const user = {
+        id: crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(12).toString('hex'),
+        name,
+        username,
+        email,
+        mobile,
+        bio,
+        gender,
+        role,
+        password: hashedPassword,
+        isVerified: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const otp = generateOTP();
+      user.otp = otp;
+      user.otpExpires = Date.now() + 10 * 60 * 1000;
+      await fileDbSaveUser(user);
+
+      await sendOTP(email, otp);
+
+      return res.status(201).json({
+        message: 'User registered successfully. Please verify your email with OTP.',
+        userId: user.id,
+      });
+    }
+
+    // MongoDB flow
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create user
     const user = await User.create({
       name,
       username,
@@ -59,21 +177,19 @@ const registerUser = async (req, res) => {
       password,
     });
 
-    // Generate OTP
     const otp = generateOTP();
     user.otp = otp;
     user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
 
-    // Send OTP
     await sendOTP(email, otp);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'User registered successfully. Please verify your email with OTP.',
       userId: user._id,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -84,6 +200,28 @@ const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
+    if (USE_FILE_DB) {
+      const user = fileDbGetUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+      if (user.otp !== otp || user.otpExpires < Date.now()) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+      }
+      user.isVerified = true;
+      delete user.otp;
+      delete user.otpExpires;
+      user.updatedAt = new Date().toISOString();
+      await fileDbSaveUser(user);
+
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      return res.json({
+        message: 'OTP verified successfully',
+        token,
+        user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
@@ -102,7 +240,7 @@ const verifyOTP = async (req, res) => {
       expiresIn: '30d',
     });
 
-    res.json({
+    return res.json({
       message: 'OTP verified successfully',
       token,
       user: {
@@ -113,7 +251,7 @@ const verifyOTP = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -124,17 +262,29 @@ const authUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    if (USE_FILE_DB) {
+      const user = fileDbGetUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      return res.json({
+        token,
+        user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      });
+    }
+
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
-      if (!user.isVerified) {
-        return res.status(400).json({ message: 'Please verify your email first' });
-      }
-
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
         expiresIn: '30d',
       });
 
-      res.json({
+      return res.json({
         token,
         user: {
           id: user._id,
@@ -143,11 +293,10 @@ const authUser = async (req, res) => {
           role: user.role,
         },
       });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
     }
+    return res.status(401).json({ message: 'Invalid email or password' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -158,6 +307,20 @@ const sendLoginOTP = async (req, res) => {
   const { email } = req.body;
 
   try {
+    if (USE_FILE_DB) {
+      const user = fileDbGetUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+      const otp = generateOTP();
+      user.otp = otp;
+      user.otpExpires = Date.now() + 10 * 60 * 1000;
+      user.updatedAt = new Date().toISOString();
+      await fileDbSaveUser(user);
+      await sendOTP(email, otp);
+      return res.json({ message: 'OTP sent to your email' });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
@@ -170,9 +333,9 @@ const sendLoginOTP = async (req, res) => {
 
     await sendOTP(email, otp);
 
-    res.json({ message: 'OTP sent to your email' });
+    return res.json({ message: 'OTP sent to your email' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -183,6 +346,26 @@ const loginWithOTP = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
+    if (USE_FILE_DB) {
+      const user = fileDbGetUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+      if (user.otp !== otp || user.otpExpires < Date.now()) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+      }
+      delete user.otp;
+      delete user.otpExpires;
+      user.updatedAt = new Date().toISOString();
+      await fileDbSaveUser(user);
+
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      return res.json({
+        token,
+        user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
@@ -200,7 +383,7 @@ const loginWithOTP = async (req, res) => {
       expiresIn: '30d',
     });
 
-    res.json({
+    return res.json({
       token,
       user: {
         id: user._id,
@@ -210,7 +393,7 @@ const loginWithOTP = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 

@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import "./MentorForm.css";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import { mentorAPI } from "../services/api";
 
 const MentorForm = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); // Initialize useLocation
+  const { userId } = location.state || {}; // Get userId from location state
+
   const [formData, setFormData] = useState({
+    user: userId || '', // Initialize user with userId from state
     primaryDomain: "",
     secondaryDomain: "",
     linkedin: "",
@@ -15,6 +22,13 @@ const MentorForm = () => {
     weeklyAvailability: [],
     skills: []
   });
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      setFormData((prev) => ({ ...prev, user: userId }));
+    }
+  }, [userId]);
 
   const domains = [
     "Web Development", "Mobile Development", "Data Science", "Machine Learning",
@@ -73,86 +87,98 @@ const MentorForm = () => {
     { value: "Vue.js", label: "Vue.js" }
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Mentor form submitted:", formData);
-    alert("Form submitted! Check console for data.");
+    try {
+      const response = await mentorAPI.submitForm(formData);
+      console.log("Mentor form submission response:", response);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigate("/home");
+      }, 1500);
+    } catch (error) {
+      console.error("Mentor form submission error:", error);
+      alert('Mentor form submission failed: ' + (error.response?.data?.message || error.message));
+    }
   };
 
   return (
     <div className="mentor-form-container">
-      <form onSubmit={handleSubmit}>
-        {/* Domain Expertise */}
+      <form className="student-form" onSubmit={handleSubmit}>
+        {/* Match StudentForm structure: simple stacked groups */}
         <div className="form-group">
-          <label>Domain's your Expertise <span className="required">*</span></label>
+          <label>
+            Primary Domain <span className="required">*</span>
+          </label>
           <select
             name="primaryDomain"
             value={formData.primaryDomain}
             onChange={handleChange}
             required
           >
-            <option value="">Primary Domain</option>
+            <option value="">Select Primary Domain</option>
             {domains.map((domain, i) => (
-              <option key={i} value={domain}>{domain}</option>
+              <option key={i} value={domain}>
+                {domain}
+              </option>
             ))}
           </select>
+        </div>
 
+        <div className="form-group">
+          <label>Secondary Domain</label>
           <select
             name="secondaryDomain"
             value={formData.secondaryDomain}
             onChange={handleChange}
           >
-            <option value="">Secondary Domain</option>
+            <option value="">Select Secondary Domain</option>
             {domains.map((domain, i) => (
-              <option key={i} value={domain}>{domain}</option>
+              <option key={i} value={domain}>
+                {domain}
+              </option>
             ))}
           </select>
         </div>
 
-        {/* LinkedIn */}
         <div className="form-group">
-          <label>Enter your LinkedIn Id <span className="required">*</span></label>
+          <label>
+            LinkedIn Profile <span className="required">*</span>
+          </label>
           <input
             type="text"
             name="linkedin"
-            placeholder="Enter your LinkedIn Id"
+            placeholder="Enter your LinkedIn profile URL or ID"
             value={formData.linkedin}
             onChange={handleChange}
             required
           />
         </div>
 
-        {/* Role */}
         <div className="form-group">
-          <label>Your current role and Organization <span className="required">*</span></label>
+          <label>
+            Your current role and Organization <span className="required">*</span>
+          </label>
           <input
             type="text"
             name="role"
-            placeholder="Enter your current role and organization"
+            placeholder="e.g., Senior Engineer @ ABC Corp"
             value={formData.role}
             onChange={handleChange}
             required
           />
         </div>
 
-        {/* Requirements */}
-        <div className="form-group checkbox-single">
-          <input
-            type="checkbox"
-            name="requirements"
-            checked={formData.requirements}
-            onChange={handleChange}
-          />
-          <label>Requirements to be a mentor</label>
-        </div>
-
-        {/* Experience */}
         <div className="form-group">
-          <label>Experience in Primary Domain <span className="required">*</span></label>
+          <label>
+            Experience in Primary Domain <span className="required">*</span>
+          </label>
           <input
             type="text"
             name="primaryExperience"
-            placeholder="How many years of experience do you have?"
+            placeholder="Years of experience"
             value={formData.primaryExperience}
             onChange={handleChange}
             required
@@ -160,7 +186,9 @@ const MentorForm = () => {
         </div>
 
         <div className="form-group">
-          <label>Have you mentored anyone before? If yes, in what capacity? <span className="required">*</span></label>
+          <label>
+            Have you mentored anyone before? If yes, in what capacity? <span className="required">*</span>
+          </label>
           <textarea
             name="mentorshipExperience"
             placeholder="Mention your mentorship experience"
@@ -171,14 +199,16 @@ const MentorForm = () => {
           />
         </div>
 
-        {/* Preferred mentoring style */}
         <div className="form-group">
-          <label>Preferred mentoring style <span className="required">*</span></label>
+          <label>
+            Preferred mentoring style <span className="required">*</span>
+          </label>
           <div className="checkbox-group">
             {mentoringStyles.map((style, i) => (
-              <label key={i}>
+              <label key={style}>
                 <input
                   type="checkbox"
+                  value={style}
                   checked={formData.mentoringStyle.includes(style)}
                   onChange={() => handleCheckboxGroup("mentoringStyle", style)}
                 />
@@ -188,14 +218,16 @@ const MentorForm = () => {
           </div>
         </div>
 
-        {/* Weekly availability */}
         <div className="form-group">
-          <label>Weekly availability <span className="required">*</span></label>
+          <label>
+            Weekly availability <span className="required">*</span>
+          </label>
           <div className="checkbox-group">
-            {weeklyAvailabilityOptions.map((opt, i) => (
-              <label key={i}>
+            {weeklyAvailabilityOptions.map((opt) => (
+              <label key={opt}>
                 <input
                   type="checkbox"
+                  value={opt}
                   checked={formData.weeklyAvailability.includes(opt)}
                   onChange={() => handleCheckboxGroup("weeklyAvailability", opt)}
                 />
@@ -205,9 +237,8 @@ const MentorForm = () => {
           </div>
         </div>
 
-        {/* Skills Dropdown */}
         <div className="form-group">
-          <label>Select Skills you can mentor in</label>
+          <label>Skills you can mentor in</label>
           <Select
             options={skillOptions}
             isMulti
@@ -216,9 +247,42 @@ const MentorForm = () => {
           />
         </div>
 
-        {/* Submit */}
-        <button type="submit" className="btn-submit">Continue</button>
+        <div className="form-group">
+          <label>
+            I meet the requirements to be a mentor
+          </label>
+          <div className="checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="requirements"
+                checked={formData.requirements}
+                onChange={handleChange}
+              />
+              Yes
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" className="btn-primary">Continue</button>
       </form>
+      {showSuccess && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 20,
+            right: 20,
+            background: '#10b981',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: 8,
+            boxShadow: '0 10px 15px rgba(0,0,0,0.1)',
+            zIndex: 9999,
+          }}
+        >
+          Profile created successfully! Explore now →
+        </div>
+      )}
     </div>
   );
 };

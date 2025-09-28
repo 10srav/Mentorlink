@@ -1,0 +1,33 @@
+.mentor-card {
+  background: #f6f7f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+}
+.mentor-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mentor-card__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+.mentor-card__name { font-size: 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.verified { color: #3b82f6; }
+.mentor-card__meta { color: #6b7280; font-size: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+.mentor-card__bio { margin: 10px 0; color: #1f2937; }
+.read-more { background: transparent; color: #1f2937; font-weight: 600; border: none; cursor: pointer; padding: 0; margin-bottom: 8px; }
+.mentor-card__tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { background: #ffffff; border: 1px solid #d1d5db; border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+.tag--more { background: #f3f4f6; }
+.mentor-card__core { margin-top: 10px; font-size: 13px; color: #374151; }
+
+/* Dark mode */
+body.dark-mode .mentor-card { background: #111827; border-color: #374151; }
+body.dark-mode .mentor-card__meta { color: #9ca3af; }
+body.dark-mode .mentor-card__bio { color: #e5e7eb; }
+body.dark-mode .tag { background: #0f172a; border-color: #334155; color: #e5e7eb; }

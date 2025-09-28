@@ -1,10 +1,15 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import "./StudentForm.css";
+import { studentAPI } from "../services/api"; // Corrected import path and named import
 
 const StudentForm = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Initialize useLocation
+  const { userId } = location.state || {}; // Get userId from location state
+
   const [formData, setFormData] = useState({
+    user: userId || '', // Initialize user with userId from state
     roleStatus: "",
     mentorshipField: [], // now stores multiple skills
     experienceLevel: "",
@@ -14,6 +19,13 @@ const StudentForm = () => {
     goal: "",
     portfolio: "",
   });
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      setFormData((prev) => ({ ...prev, user: userId }));
+    }
+  }, [userId]);
 
   const [inputValue, setInputValue] = useState("");
 
@@ -65,10 +77,21 @@ const StudentForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitted form data:", formData);
-    navigate("/dashboard"); // redirect after submit
+    try {
+      const response = await studentAPI.submitForm(formData);
+      console.log("Student form submission response:", response);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigate("/home");
+      }, 1500);
+    } catch (error) {
+      console.error("Student form submission error:", error);
+      alert('Student form submission failed: ' + (error.response?.data?.message || error.message));
+    }
   };
 
   return (
@@ -264,6 +287,23 @@ const StudentForm = () => {
           Continue
         </button>
       </form>
+      {showSuccess && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 20,
+            right: 20,
+            background: '#10b981',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: 8,
+            boxShadow: '0 10px 15px rgba(0,0,0,0.1)',
+            zIndex: 9999,
+          }}
+        >
+          Profile created successfully! Explore now →
+        </div>
+      )}
     </div>
   );
 };

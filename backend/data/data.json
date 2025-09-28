@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": "881d32c6-0cf8-4d4e-8060-f3e80dda1c31",
+      "name": "Test User",
+      "username": "testuser1",
+      "email": "test1@example.com",
+      "mobile": "1234567890",
+      "bio": "test",
+      "gender": "male",
+      "role": "student",
+      "password": "$2a$10$lMW4fHicvgaCNnTEzqJYbOYlSwxMjR57Kji0LXCpIwEg7UIsyto5G",
+      "isVerified": false,
+      "createdAt": "2025-09-10T12:49:34.609Z",
+      "updatedAt": "2025-09-10T12:49:34.609Z",
+      "otp": "462494",
+      "otpExpires": 1757509174609
+    },
+    {
+      "id": "def4381f-144a-47aa-ade3-d5c6e03c48b3",
+      "name": "dynamic dp",
+      "username": "dynamic__durga",
+      "email": "dynamic.dp.prasad@gmail.com",
+      "mobile": "980909019",
+      "bio": "sairaam",
+      "gender": "male",
+      "role": "student",
+      "password": "$2a$10$7.VCuV2sdxNTLbY/FLB.sOGgkS3haIvH9Uefeh2zKV4.iR4HG6pni",
+      "isVerified": false,
+      "createdAt": "2025-09-10T12:54:05.947Z",
+      "updatedAt": "2025-09-10T12:54:05.947Z",
+      "otp": "904712",
+      "otpExpires": 1757509445947
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+import React, { useState } from "react";
+import "./FilterPanel.css";
+
+const allDomains = [
+  "Tech Mentor",
+  "Startup Mentor",
+  "Professor",
+  "Professor in experiences",
+  "UI/UX Developer",
+  "Flutter",
+  "Kotlin",
+  "Python",
+];
+
+const companies = ["Google", "Microsoft", "Facebook", "Accenture"];
+
+const FilterPanel = ({ filters, setFilters }) => {
+  const [domainSearch, setDomainSearch] = useState("");
+  const [companySearch, setCompanySearch] = useState("");
+
+  const toggleDomain = (d) => {
+    const exists = filters.domains.includes(d);
+    const next = exists
+      ? filters.domains.filter((x) => x !== d)
+      : [...filters.domains, d];
+    setFilters({ ...filters, domains: next });
+  };
+
+  const toggleCompany = (c) => {
+    const exists = filters.companies.includes(c);
+    const next = exists
+      ? filters.companies.filter((x) => x !== c)
+      : [...filters.companies, c];
+    setFilters({ ...filters, companies: next });
+  };
+
+  const filteredDomains = allDomains.filter((d) =>
+    d.toLowerCase().includes(domainSearch.toLowerCase())
+  );
+  const filteredCompanies = companies.filter((c) =>
+    c.toLowerCase().includes(companySearch.toLowerCase())
+  );
+
+  return (
+    <aside className="filter-panel">
+      <div className="filter-panel__title">Filter by</div>
+
+      <div className="filter-group">
+        <label className="filter-label">Domain</label>
+        <input
+          className="filter-input"
+          placeholder="Search for Domain"
+          value={domainSearch}
+          onChange={(e) => setDomainSearch(e.target.value)}
+        />
+        <div className="chip-list">
+          {filteredDomains.map((d) => (
+            <button
+              key={d}
+              className={`chip ${filters.domains.includes(d) ? "chip--active" : ""}`}
+              onClick={() => toggleDomain(d)}
+              type="button"
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="filter-group">
+        <label className="filter-label">Company</label>
+        <input
+          className="filter-input"
+          placeholder="Search for Company"
+          value={companySearch}
+          onChange={(e) => setCompanySearch(e.target.value)}
+        />
+        <div className="chip-list">
+          {filteredCompanies.map((c) => (
+            <button
+              key={c}
+              className={`chip ${filters.companies.includes(c) ? "chip--active" : ""}`}
+              onClick={() => toggleCompany(c)}
+              type="button"
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+    </aside>
+  );
+};
+
+export default FilterPanel;

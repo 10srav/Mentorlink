@@ -1,9 +1,16 @@
 // MentorLinkForm.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./EventOrganizer.css";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import { organizerAPI } from "../services/api";
 
 const EventOrganizer = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); // Initialize useLocation
+  const { userId } = location.state || {}; // Get userId from location state
+
   const [formData, setFormData] = useState({
+    user: userId || '', // Initialize user with userId from state
     pastEvents: "",
     eventTypes: [],
     mode: [],
@@ -12,6 +19,13 @@ const EventOrganizer = () => {
     motivation: "",
     audience: [],
   });
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      setFormData((prev) => ({ ...prev, user: userId }));
+    }
+  }, [userId]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,10 +42,21 @@ const EventOrganizer = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form Submitted:", formData);
-    alert("Form submitted successfully!");
+    try {
+      const response = await organizerAPI.submitForm(formData);
+      console.log("Organizer form submission response:", response);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigate("/home");
+      }, 1500);
+    } catch (error) {
+      console.error("Organizer form submission error:", error);
+      alert('Organizer form submission failed: ' + (error.response?.data?.message || error.message));
+    }
   };
 
   return (
@@ -135,6 +160,23 @@ const EventOrganizer = () => {
           </div>
         </form>
       </div>
+      {showSuccess && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 20,
+            right: 20,
+            background: '#10b981',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: 8,
+            boxShadow: '0 10px 15px rgba(0,0,0,0.1)',
+            zIndex: 9999,
+          }}
+        >
+          Profile created successfully! Explore now →
+        </div>
+      )}
     </div>
   );
 };
