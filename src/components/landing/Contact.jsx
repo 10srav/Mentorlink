@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import './Contact.css';
+import contactImage from '../../assets/contact.png';
 
 const Contact = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -34,61 +35,11 @@ const Contact = () => {
         {/* Left Illustration */}
         <div className="contact-illustration">
           <div className={`illustration-wrapper ${isVisible ? 'animate-in' : ''}`}>
-            {/* Chat Bubbles */}
-            <div className="chat-bubbles">
-              <div className="chat-bubble bubble-1">
-                <div className="bubble-lines">
-                  <div className="line"></div>
-                  <div className="line short"></div>
-                </div>
-              </div>
-              <div className="chat-bubble bubble-2">
-                <div className="checkmark">✓</div>
-              </div>
-            </div>
-
-            {/* Main Characters */}
-            <div className="characters">
-              {/* Left Character - Male */}
-              <div className="character male-character">
-                <div className="character-head">
-                  <div className="hair male-hair"></div>
-                  <div className="face">
-                    <div className="eye left-eye"></div>
-                    <div className="eye right-eye"></div>
-                    <div className="smile"></div>
-                  </div>
-                </div>
-                <div className="character-body male-body">
-                  <div className="shirt"></div>
-                  <div className="phone">
-                    <div className="phone-screen"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Character - Female */}
-              <div className="character female-character">
-                <div className="character-head">
-                  <div className="hair female-hair"></div>
-                  <div className="face">
-                    <div className="eye left-eye"></div>
-                    <div className="eye right-eye"></div>
-                    <div className="smile"></div>
-                  </div>
-                </div>
-                <div className="character-body female-body">
-                  <div className="shirt"></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Floating Elements */}
-            <div className="floating-elements">
-              <div className="floating-icon icon-1">💬</div>
-              <div className="floating-icon icon-2">📱</div>
-              <div className="floating-icon icon-3">✉️</div>
-            </div>
+            <img
+              src={contactImage}
+              alt="Contact Us Illustration"
+              className="contact-image"
+            />
           </div>
         </div>
 

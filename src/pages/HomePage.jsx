@@ -3,6 +3,7 @@ import HomeNavbar from '../components/common/HomeNavbar';
 import Sidebar from '../components/home/Sidebar';
 import FilterPanel from '../components/home/FilterPanel';
 import MentorCard from '../components/home/MentorCard';
+import Footer from '../components/common/Footer';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -114,13 +115,28 @@ const HomePage = () => {
     if (filters.companies.length) {
       list = list.filter(m => filters.companies.includes(m.company));
     }
-    if (filters.sort === 'experience') {
-      list.sort((a,b) => b.experience - a.experience);
+    // Sorting
+    switch (filters.sort) {
+      case 'experience':
+        list.sort((a, b) => b.experience - a.experience);
+        break;
+      case 'rating':
+        list.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'sessions':
+        list.sort((a, b) => b.sessions - a.sessions);
+        break;
+      case 'name':
+        list.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'recent':
+        list.sort((a, b) => b.id - a.id);
+        break;
+      default:
+        list.sort((a, b) => b.experience - a.experience);
     }
     return list;
   }, [mentors, filters]);
-
-  // Removed featured profiles section
 
   // More realistic testimonials
   const testimonials = useMemo(() => ([
@@ -159,10 +175,12 @@ const HomePage = () => {
               onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
             >
               <option value="experience">Sort By: Experience</option>
+              <option value="rating">Sort By: Rating</option>
+              <option value="sessions">Sort By: Sessions</option>
+              <option value="name">Sort By: Name</option>
+              <option value="recent">Sort By: Recently Joined</option>
             </select>
           </div>
-
-          {/* Removed mentor cards section at top */}
 
           <div className="cards">
             {filtered.map((m) => (
@@ -192,6 +210,8 @@ const HomePage = () => {
               ))}
             </div>
           </section>
+
+          <Footer />
         </main>
 
         <FilterPanel filters={filters} setFilters={setFilters} />

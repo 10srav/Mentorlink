@@ -1,16 +1,16 @@
-// MentorLinkForm.jsx
 import React, { useState, useEffect } from "react";
 import "./EventOrganizer.css";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import { organizerAPI } from "../services/api";
+import { FiCheckCircle } from 'react-icons/fi';
 
 const EventOrganizer = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Initialize useLocation
-  const { userId } = location.state || {}; // Get userId from location state
+  const location = useLocation();
+  const { userId } = location.state || {};
 
   const [formData, setFormData] = useState({
-    user: userId || '', // Initialize user with userId from state
+    user: userId || '',
     pastEvents: "",
     eventTypes: [],
     mode: [],
@@ -51,7 +51,7 @@ const EventOrganizer = () => {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        navigate("/home");
+        navigate("/login");
       }, 1500);
     } catch (error) {
       console.error("Organizer form submission error:", error);
@@ -60,16 +60,21 @@ const EventOrganizer = () => {
   };
 
   return (
-    <div className="event-organizer-container">
-      <div className="form-box">
-        <h2 className="form-title">Event Organizer</h2>
-        <form onSubmit={handleSubmit}>
+    <div className="organizer-form-page">
+      {/* Animated Background */}
+      <div className="organizer-bg-decoration">
+        <div className="organizer-circle organizer-circle-1"></div>
+        <div className="organizer-circle organizer-circle-2"></div>
+        <div className="organizer-circle organizer-circle-3"></div>
+      </div>
 
+      <div className="organizer-form-container">
+        <h2 className="organizer-title">Complete Your Event Organizer Profile</h2>
+
+        <form className="organizer-form" onSubmit={handleSubmit}>
           {/* Past Events */}
           <div className="form-group">
-            <label>
-              Have you organized any events before? If yes, briefly describe them<span className="required">*</span>
-            </label>
+            <label>Past Events Experience*</label>
             <input
               type="text"
               name="pastEvents"
@@ -82,30 +87,57 @@ const EventOrganizer = () => {
 
           {/* Event Types */}
           <div className="form-group">
-            <label>What type of events do you want to host on our platform?<span className="required">*</span></label>
+            <label>Event Types You Want to Host*</label>
             <div className="checkbox-group">
-              <label><input type="checkbox" name="eventTypes" value="mentoring" onChange={handleChange}/> 1:1 mentoring sessions</label>
-              <label><input type="checkbox" name="eventTypes" value="panel" onChange={handleChange}/> Panel discussions</label>
-              <label><input type="checkbox" name="eventTypes" value="techTalks" onChange={handleChange}/> Tech talks</label>
-              <label><input type="checkbox" name="eventTypes" value="resumeReview" onChange={handleChange}/> Resume/portfolio reviews</label>
-              <label><input type="checkbox" name="eventTypes" value="fireside" onChange={handleChange}/> Fireside chats / AMAs</label>
-              <label><input type="checkbox" name="eventTypes" value="showcase" onChange={handleChange}/> Student showcases / demo days</label>
+              <label>
+                <input type="checkbox" name="eventTypes" value="mentoring" onChange={handleChange}/>
+                1:1 mentoring sessions
+              </label>
+              <label>
+                <input type="checkbox" name="eventTypes" value="panel" onChange={handleChange}/>
+                Panel discussions
+              </label>
+              <label>
+                <input type="checkbox" name="eventTypes" value="techTalks" onChange={handleChange}/>
+                Tech talks
+              </label>
+              <label>
+                <input type="checkbox" name="eventTypes" value="resumeReview" onChange={handleChange}/>
+                Resume/portfolio reviews
+              </label>
+              <label>
+                <input type="checkbox" name="eventTypes" value="fireside" onChange={handleChange}/>
+                Fireside chats / AMAs
+              </label>
+              <label>
+                <input type="checkbox" name="eventTypes" value="showcase" onChange={handleChange}/>
+                Student showcases / demo days
+              </label>
             </div>
           </div>
 
           {/* Event Mode */}
           <div className="form-group">
-            <label>What type of events do you want to host on our platform?<span className="required">*</span></label>
+            <label>Preferred Event Mode*</label>
             <div className="checkbox-group">
-              <label><input type="checkbox" name="mode" value="hybrid" onChange={handleChange}/> Live online / Hybrid</label>
-              <label><input type="checkbox" name="mode" value="inPerson" onChange={handleChange}/> In-person</label>
-              <label><input type="checkbox" name="mode" value="recorded" onChange={handleChange}/> Pre-recorded</label>
+              <label>
+                <input type="checkbox" name="mode" value="hybrid" onChange={handleChange}/>
+                Live online / Hybrid
+              </label>
+              <label>
+                <input type="checkbox" name="mode" value="inPerson" onChange={handleChange}/>
+                In-person
+              </label>
+              <label>
+                <input type="checkbox" name="mode" value="recorded" onChange={handleChange}/>
+                Pre-recorded
+              </label>
             </div>
           </div>
 
           {/* Domains */}
           <div className="form-group">
-            <label>Which domains will your event focus on?<span className="required">*</span></label>
+            <label>Event Focus Domains*</label>
             <input
               type="text"
               name="domains"
@@ -118,22 +150,38 @@ const EventOrganizer = () => {
 
           {/* MentorLink Help */}
           <div className="form-group">
-            <label>
-              Do you need help from the MentorLink team?<span className="required">*</span> If Yes → What kind of help?
-            </label>
+            <label>Help Needed from MentorLink Team*</label>
             <div className="checkbox-group">
-              <label><input type="checkbox" name="help" value="promotion" onChange={handleChange}/> Promotion & outreach</label>
-              <label><input type="checkbox" name="help" value="speakers" onChange={handleChange}/> Finding speakers</label>
-              <label><input type="checkbox" name="help" value="hosting" onChange={handleChange}/> Hosting / moderation</label>
-              <label><input type="checkbox" name="help" value="techSetup" onChange={handleChange}/> Tech setup</label>
-              <label><input type="checkbox" name="help" value="planning" onChange={handleChange}/> Event planning & structure</label>
-              <label><input type="checkbox" name="help" value="feedback" onChange={handleChange}/> Follow-up & feedback collection</label>
+              <label>
+                <input type="checkbox" name="help" value="promotion" onChange={handleChange}/>
+                Promotion & outreach
+              </label>
+              <label>
+                <input type="checkbox" name="help" value="speakers" onChange={handleChange}/>
+                Finding speakers
+              </label>
+              <label>
+                <input type="checkbox" name="help" value="hosting" onChange={handleChange}/>
+                Hosting / moderation
+              </label>
+              <label>
+                <input type="checkbox" name="help" value="techSetup" onChange={handleChange}/>
+                Tech setup
+              </label>
+              <label>
+                <input type="checkbox" name="help" value="planning" onChange={handleChange}/>
+                Event planning & structure
+              </label>
+              <label>
+                <input type="checkbox" name="help" value="feedback" onChange={handleChange}/>
+                Follow-up & feedback collection
+              </label>
             </div>
           </div>
 
           {/* Motivation */}
           <div className="form-group">
-            <label>What is your motivation for organizing this event?<span className="required">*</span></label>
+            <label>Your Motivation*</label>
             <textarea
               name="motivation"
               placeholder="Tell us what impact you hope to make"
@@ -146,35 +194,34 @@ const EventOrganizer = () => {
 
           {/* Target Audience */}
           <div className="form-group">
-            <label>Target audience<span className="required">*</span></label>
+            <label>Target Audience*</label>
             <div className="checkbox-group">
-              <label><input type="checkbox" name="audience" value="students" onChange={handleChange}/> Students</label>
-              <label><input type="checkbox" name="audience" value="professionals" onChange={handleChange}/> Professionals</label>
-              <label><input type="checkbox" name="audience" value="all" onChange={handleChange}/> Open to all</label>
+              <label>
+                <input type="checkbox" name="audience" value="students" onChange={handleChange}/>
+                Students
+              </label>
+              <label>
+                <input type="checkbox" name="audience" value="professionals" onChange={handleChange}/>
+                Professionals
+              </label>
+              <label>
+                <input type="checkbox" name="audience" value="all" onChange={handleChange}/>
+                Open to all
+              </label>
             </div>
           </div>
 
-          {/* Submit */}
-          <div className="form-actions">
-            <button type="submit" className="submit-btn">Continue</button>
-          </div>
+          <button type="submit" className="submit-btn">
+            Continue
+          </button>
         </form>
       </div>
+
+      {/* Success Toast */}
       {showSuccess && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 20,
-            right: 20,
-            background: '#10b981',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: 8,
-            boxShadow: '0 10px 15px rgba(0,0,0,0.1)',
-            zIndex: 9999,
-          }}
-        >
-          Profile created successfully! Explore now →
+        <div className="success-toast">
+          <FiCheckCircle className="toast-icon" />
+          <span>Profile created successfully! Redirecting...</span>
         </div>
       )}
     </div>

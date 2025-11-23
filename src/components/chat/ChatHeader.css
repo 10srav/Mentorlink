@@ -1,0 +1,108 @@
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.back-button {
+  display: none;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+@media (max-width: 768px) {
+  .back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.recipient-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.recipient-avatar-wrapper {
+  position: relative;
+}
+
+.recipient-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.recipient-details {
+  flex: 1;
+}
+
+.recipient-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 2px 0;
+}
+
+.recipient-status {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.chat-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.header-action-btn {
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-action-btn:hover {
+  background: #f3f4f6;
+  color: #ff914d;
+}

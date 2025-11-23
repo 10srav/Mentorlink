@@ -1,55 +1,152 @@
-.home-navbar {
+/* ==================== NAVBAR CONTAINER ==================== */
+.navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
-  background: var(--panel, #ffffff);
-  border-bottom: 1px solid var(--border, #e5e7eb);
+  height: 72px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   z-index: 1000;
 }
 
-.home-navbar__inner {
-  max-width: 1200px;
+.navbar-container {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.brand {
-  display: inline-flex;
+/* ==================== LOGO ==================== */
+.navbar-logo {
+  display: flex;
   align-items: center;
-  gap: 10px;
   cursor: pointer;
+  transition: opacity 0.2s ease;
+  outline: none;
 }
 
-.brand__logo {
-  height: 36px;
+.navbar-logo:hover {
+  opacity: 0.85;
+}
+
+.logo-image {
+  height: 48px;
   width: auto;
   object-fit: contain;
 }
 
-.brand__name {
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--text, #1f2937);
-}
-
-.actions {
-  display: inline-flex;
+/* ==================== RIGHT SECTION ==================== */
+.navbar-right {
+  display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.btn {
-  border: none;
-  border-radius: 999px;
-  padding: 10px 14px;
+/* ==================== ICON BUTTONS ==================== */
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1f2937;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.icon-btn:hover {
+  background: #f9fafb;
+  border-color: #3b82f6;
+  transform: scale(1.08);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+  color: inherit;
+  display: block;
+}
+
+.icon-btn svg path {
+  stroke: currentColor;
+  fill: none;
+}
+
+/* ==================== MESSAGES BUTTON ==================== */
+.messages-btn {
+  position: relative;
+}
+
+.messages-btn .badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  border: 2px solid #ffffff;
+}
+
+/* ==================== THEME TOGGLE ==================== */
+.theme-toggle {
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.theme-toggle svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.5;
+  stroke: currentColor;
+  fill: none;
+  display: block;
+}
+
+.theme-toggle svg path {
+  stroke: currentColor;
+  fill: none;
+}
+
+.theme-toggle:hover {
+  background: #fef3c7;
+  border-color: #fbbf24;
+}
+
+/* ==================== LOGOUT BUTTON ==================== */
+.logout-btn {
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  color: #1f2937;
+  border-radius: 12px;
+  padding: 10px 16px;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -57,69 +154,202 @@
   transition: all 0.2s ease;
 }
 
-.btn--ghost {
-  background: var(--panel);
-  color: var(--text);
-}
-.btn--ghost:hover { filter: brightness(0.95); }
-
-.icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--panel, #ffffff);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text);
-}
-.icon-btn svg { fill: currentColor; stroke: currentColor; }
-.nav-actions-left { position: relative; }
-.icon-btn.small { width: auto; height: auto; padding: 8px; border-radius: 8px; border: none; background: transparent; }
-.icon-btn .notif-dot { display: none; }
-.notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger, #ef4444); border-radius: 50%; border: 2px solid var(--panel, #ffffff); }
-.notif-popup {
-  position: absolute;
-  right: 0;
-  top: 42px;
-  width: 260px;
-  background: var(--panel);
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 8px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-  z-index: 1400;
-}
-.notif-header { padding: 10px 12px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text); }
-.notif-item { padding: 10px 12px; font-size: 14px; color: var(--text); }
-.theme-toggle { border: 1px solid var(--border, #e5e7eb); padding: 8px; border-radius: 8px; color: var(--text); background: transparent; }
-.icon-btn:hover {
-  background: #f3f4f6;
+.logout-btn:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #dc2626;
 }
 
+.logout-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+  stroke: currentColor;
+  fill: none;
+  display: block;
+}
+
+.logout-btn svg path {
+  stroke: currentColor;
+  fill: none;
+}
+
+/* ==================== AVATAR ==================== */
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 1px solid #e5e7eb;
+  border: 2px solid #e5e7eb;
   background: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-}
-.avatar:hover {
-  background: #f3f4f6;
+  transition: all 0.2s ease;
+  font-size: 22px;
+  overflow: hidden;
 }
 
-/* Use landing page palette (blue) on focus states */
-.btn--ghost:focus,
+.avatar:hover {
+  border-color: #3b82f6;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* ==================== FOCUS STATES ==================== */
 .icon-btn:focus,
-.avatar:focus {
+.logout-btn:focus,
+.avatar:focus,
+.navbar-logo:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* Dark mode */
-/* dark mode specifics now use variables from index.css. Fallbacks above handle light mode */
+/* ==================== DARK MODE ==================== */
+body.dark-mode .navbar {
+  background: #1f2937;
+  border-bottom-color: #374151;
+}
+
+body.dark-mode .navbar-logo:hover {
+  opacity: 0.9;
+}
+
+body.dark-mode .logo-image {
+  filter: brightness(1.2) contrast(1.1);
+}
+
+body.dark-mode .icon-btn {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+body.dark-mode .icon-btn:hover {
+  background: #4b5563;
+  border-color: #60a5fa;
+  color: #ffffff;
+}
+
+body.dark-mode .icon-btn svg {
+  stroke: currentColor;
+  stroke-width: 2.5;
+}
+
+body.dark-mode .theme-toggle:hover {
+  background: #374151;
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+body.dark-mode .logout-btn {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+body.dark-mode .logout-btn:hover {
+  background: #450a0a;
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+body.dark-mode .avatar {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+body.dark-mode .avatar:hover {
+  border-color: #60a5fa;
+}
+
+body.dark-mode .messages-btn .badge {
+  border-color: #1f2937;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 16px;
+  }
+
+  .navbar-right {
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .icon-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .logout-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .logout-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .logo-image {
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    height: 64px;
+  }
+
+  .navbar-container {
+    padding: 0 12px;
+  }
+
+  .navbar-right {
+    gap: 6px;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .icon-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .logout-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .logo-image {
+    height: 36px;
+  }
+
+  .messages-btn .badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 9px;
+  }
+}

@@ -51,8 +51,12 @@ const studentSchema = new mongoose.Schema({
   profileImage: {
     type: String,
   },
+  connectionsCount: {
+    type: Number,
+    default: 0,
+  },
 }, {
   timestamps: true,
 });
 
-module.exports = mongoose.model('Student', studentSchema);
+module.exports = mongoose.models.Student || mongoose.model('Student', studentSchema);

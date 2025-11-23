@@ -22,34 +22,32 @@ const generateOTP = () => {
   return otp;
 };
 
-// Create and cache a single transporter (supports SMTP or Gmail service)
+// Create and cache a single transporter using Gmail SMTP
+//
+// Gmail SMTP Setup Requirements:
+// 1. Enable 2-Factor Authentication on your Google Account
+// 2. Generate an App Password from Google Account Settings > Security > App Passwords
+// 3. Use the App Password (16 characters without spaces) as EMAIL_PASS in .env
+//
+// Common Gmail SMTP Issues & Solutions:
+// - Invalid credentials: Verify EMAIL_USER is correct and EMAIL_PASS is App Password (not account password)
+// - Spaces in App Password: Remove all spaces from the 16-character App Password
+// - 2FA not enabled: Must enable Two-Factor Authentication before generating App Passwords
+// - "Less secure app access": This setting is deprecated; use App Passwords instead
+// - Connection timeout: Check firewall settings and ensure port 587/465 is not blocked
+//
 let cachedTransporter;
 const getTransporter = async () => {
   if (cachedTransporter) {
     return cachedTransporter;
   }
 
-  const useSmtp = Boolean(process.env.SMTP_HOST);
-  const baseConfig = useSmtp
-    ? {
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT || 587),
-        secure: String(process.env.SMTP_SECURE || 'false').toLowerCase() === 'true',
-        auth: {
-          user: process.env.SMTP_USER || process.env.EMAIL_USER,
-          pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
-        },
-      }
-    : {
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS, // App password
-        },
-      };
-
   const transporter = nodemailer.createTransport({
-    ...baseConfig,
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS, // App Password from Google Account
+    },
     pool: true,
     maxConnections: 3,
     maxMessages: 50,
@@ -61,9 +59,9 @@ const getTransporter = async () => {
   try {
     await transporter.verify();
   } catch (verifyError) {
-    // Log but do not throw here; allow send to attempt which returns clear error
+    // Log only error message, never credentials
     // eslint-disable-next-line no-console
-    console.warn('Email transporter verification failed:', verifyError?.message || verifyError);
+    console.warn('Gmail transporter verification failed:', verifyError?.message || 'Unknown error');
   }
 
   cachedTransporter = transporter;
@@ -103,8 +101,9 @@ const sendOTP = async (email, otp) => {
     const transporter = await getTransporter();
     await transporter.sendMail(mailOptions);
   } catch (err) {
+    // Log only error message without exposing credentials or sensitive data
     // eslint-disable-next-line no-console
-    console.error('Failed to send OTP email:', err?.message || err);
+    console.error('Failed to send OTP email:', err?.message || 'Unknown error');
     throw new Error('Failed to send verification email. Please try again later.');
   }
 };
@@ -118,7 +117,7 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, username, email, mobile, bio, gender, role, password } = req.body;
+  const { name, username, email, bio, gender, role, password } = req.body;
 
   try {
     if (USE_FILE_DB) {
@@ -137,7 +136,6 @@ const registerUser = async (req, res) => {
         name,
         username,
         email,
-        mobile,
         bio,
         gender,
         role,
@@ -160,17 +158,22 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // MongoDB flow
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+    // MongoDB flow - Check both email and username
+    const emailExists = await User.findOne({ email });
+    const usernameExists = await User.findOne({ username });
+
+    if (emailExists) {
+      return res.status(400).json({ message: 'Email already registered. Please login or use a different email.' });
+    }
+
+    if (usernameExists) {
+      return res.status(400).json({ message: 'Username already taken. Please choose a different username.' });
     }
 
     const user = await User.create({
       name,
       username,
       email,
-      mobile,
       bio,
       gender,
       role,
@@ -214,7 +217,7 @@ const verifyOTP = async (req, res) => {
       user.updatedAt = new Date().toISOString();
       await fileDbSaveUser(user);
 
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
       return res.json({
         message: 'OTP verified successfully',
         token,
@@ -236,7 +239,7 @@ const verifyOTP = async (req, res) => {
     user.otpExpires = undefined;
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '30d',
     });
 
@@ -271,7 +274,7 @@ const authUser = async (req, res) => {
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
       return res.json({
         token,
         user: { id: user.id, name: user.name, email: user.email, role: user.role },
@@ -280,7 +283,7 @@ const authUser = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
         expiresIn: '30d',
       });
 
@@ -359,7 +362,7 @@ const loginWithOTP = async (req, res) => {
       user.updatedAt = new Date().toISOString();
       await fileDbSaveUser(user);
 
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
       return res.json({
         token,
         user: { id: user.id, name: user.name, email: user.email, role: user.role },
@@ -379,7 +382,7 @@ const loginWithOTP = async (req, res) => {
     user.otpExpires = undefined;
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '30d',
     });
 
@@ -397,10 +400,56 @@ const loginWithOTP = async (req, res) => {
   }
 };
 
+// @desc    Upload profile picture
+// @route   POST /api/users/upload-profile-picture
+// @access  Private
+const uploadProfilePicture = async (req, res) => {
+  try {
+    if (!req.cloudinaryResult) {
+      return res.status(400).json({ message: 'No image uploaded' });
+    }
+
+    const userId = req.user._id;
+    const imageUrl = req.cloudinaryResult.secure_url;
+
+    if (USE_FILE_DB) {
+      const user = fileDb.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      user.profileImage = imageUrl;
+      user.updatedAt = new Date().toISOString();
+      await fileDbSaveUser(user);
+
+      return res.json({
+        message: 'Profile picture uploaded successfully',
+        profileImage: imageUrl,
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.profileImage = imageUrl;
+    await user.save();
+
+    return res.json({
+      message: 'Profile picture uploaded successfully',
+      profileImage: imageUrl,
+    });
+  } catch (error) {
+    console.error('Error uploading profile picture:', error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   verifyOTP,
   authUser,
   sendLoginOTP,
   loginWithOTP,
+  uploadProfilePicture,
 };

@@ -174,6 +174,69 @@
 }
 
 /* ===============================
+   Dark Mode Support
+================================ */
+body.dark-mode .footer {
+  background: #1a1a1a;
+  border-top-color: #2d2d2d;
+}
+
+/* Logo visibility enhancements */
+body.dark-mode .footer-logo-image {
+  filter: brightness(1.1) contrast(1.05);
+}
+
+body.dark-mode .footer-logo-text {
+  color: #10b981;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .footer-description {
+  color: #9ca3af;
+}
+
+body.dark-mode .social-link {
+  background: #2d2d2d;
+  border-color: #3a3a3a;
+  color: #e5e7eb;
+}
+
+body.dark-mode .social-link:hover {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+body.dark-mode .cta-text {
+  color: #e5e7eb;
+}
+
+body.dark-mode .get-started-footer-btn {
+  background: #10b981;
+}
+
+body.dark-mode .get-started-footer-btn:hover {
+  background: #059669;
+}
+
+body.dark-mode .footer-column-title {
+  color: #e5e7eb;
+}
+
+body.dark-mode .footer-link {
+  color: #9ca3af;
+}
+
+body.dark-mode .footer-link:hover {
+  color: #10b981;
+}
+
+body.dark-mode .footer-bottom {
+  border-top-color: #2d2d2d;
+  color: #6b7280;
+}
+
+/* ===============================
    Responsive
 ================================ */
 @media (max-width: 968px) {

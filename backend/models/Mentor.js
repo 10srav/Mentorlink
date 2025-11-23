@@ -44,8 +44,48 @@ const mentorSchema = new mongoose.Schema({
   skills: [{
     type: String,
   }],
+  postsCount: {
+    type: Number,
+    default: 0,
+  },
+  // Profile view tracking
+  profileViews: [{
+    viewer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    viewedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    ipAddress: String,
+  }],
+  totalProfileViews: {
+    type: Number,
+    default: 0,
+  },
+  weeklyViewCount: {
+    type: Number,
+    default: 0,
+  },
+  monthlyViewCount: {
+    type: Number,
+    default: 0,
+  },
+  lastViewReset: {
+    type: Date,
+    default: Date.now,
+  },
+  activeMentees: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
+  menteesCount: {
+    type: Number,
+    default: 0,
+  },
 }, {
   timestamps: true,
 });
 
-module.exports = mongoose.model('Mentor', mentorSchema);
+module.exports = mongoose.models.Mentor || mongoose.model('Mentor', mentorSchema);

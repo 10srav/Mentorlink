@@ -130,11 +130,12 @@
 .scroll-fade-right { right: 0; background: linear-gradient(to left, var(--white), transparent); }
 
 /* Dark Mode */
-body.dark-mode .about-section { background: linear-gradient(135deg, #0F172A, #1E293B); }
-body.dark-mode .about-title { color: var(--primary-light); }
-body.dark-mode .about-subtitle { color: var(--muted); }
-body.dark-mode .about-card { background: #1E293B; border-color: rgba(59, 130, 246, 0.3); }
-body.dark-mode .card-title { color: var(--white); }
-body.dark-mode .card-description { color: var(--muted); }
-body.dark-mode .scroll-fade-left  { background: linear-gradient(to right, #0F172A, transparent); }
-body.dark-mode .scroll-fade-right { background: linear-gradient(to left, #0F172A, transparent); }
+body.dark-mode .about-section { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+body.dark-mode .about-title { color: #93c5fd; }
+body.dark-mode .about-subtitle { color: #e5e7eb; }
+body.dark-mode .about-card { background: #1e293b; border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+body.dark-mode .about-card:hover { box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2); }
+body.dark-mode .card-title { color: #f9fafb; }
+body.dark-mode .card-description { color: #d1d5db; }
+body.dark-mode .scroll-fade-left  { background: linear-gradient(to right, #0f172a, transparent); }
+body.dark-mode .scroll-fade-right { background: linear-gradient(to left, #0f172a, transparent); }

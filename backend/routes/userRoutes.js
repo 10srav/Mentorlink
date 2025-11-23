@@ -6,7 +6,10 @@ const {
   authUser,
   sendLoginOTP,
   loginWithOTP,
+  uploadProfilePicture,
 } = require('../controllers/userController');
+const { protect } = require('../middleware/auth');
+const { upload, uploadToCloudinary } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -17,7 +20,6 @@ router.post(
     body('name', 'Name is required').not().isEmpty(),
     body('username', 'Username is required').not().isEmpty(),
     body('email', 'Please include a valid email').isEmail(),
-    body('mobile', 'Mobile number is required').not().isEmpty(),
     body('bio', 'Bio is required').not().isEmpty(),
     body('gender', 'Gender is required').isIn(['male', 'female', 'other']),
     body('role', 'Role is required').isIn(['student', 'mentor', 'organizer']),
@@ -37,5 +39,9 @@ router.post('/send-login-otp', sendLoginOTP);
 
 // @route   POST /api/users/login-otp
 router.post('/login-otp', loginWithOTP);
+
+// @route   POST /api/users/upload-profile-picture
+// @access  Private
+router.post('/upload-profile-picture', protect, upload.single('profileImage'), uploadToCloudinary, uploadProfilePicture);
 
 module.exports = router;

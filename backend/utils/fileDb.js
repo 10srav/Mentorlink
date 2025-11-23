@@ -22,7 +22,7 @@ const readJson = () => {
     if (!Array.isArray(parsed.users)) parsed.users = [];
     if (!Array.isArray(parsed.students)) parsed.students = [];
     return parsed;
-  } catch (_) {
+  } catch {
     return { users: [], students: [] };
   }
 };

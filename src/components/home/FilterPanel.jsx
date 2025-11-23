@@ -1,22 +1,24 @@
 import React, { useState } from "react";
 import "./FilterPanel.css";
 
-const allDomains = [
-  "Tech Mentor",
-  "Startup Mentor",
-  "Professor",
-  "Professor in experiences",
-  "UI/UX Developer",
-  "Flutter",
-  "Kotlin",
-  "Python",
-];
-
-const companies = ["Google", "Microsoft", "Facebook", "Accenture"];
-
-const FilterPanel = ({ filters, setFilters }) => {
+const FilterPanel = ({ filters, setFilters, availableDomains = [], availableCompanies = [] }) => {
   const [domainSearch, setDomainSearch] = useState("");
   const [companySearch, setCompanySearch] = useState("");
+
+  // Use provided domains/companies or fallback to defaults
+  const allDomains = availableDomains.length > 0 ? availableDomains : [
+    "Tech Mentor",
+    "Startup Mentor",
+    "Professor",
+    "UI/UX Developer",
+  ];
+
+  const companies = availableCompanies.length > 0 ? availableCompanies : [
+    "Google",
+    "Microsoft",
+    "Facebook",
+    "Amazon"
+  ];
 
   const toggleDomain = (d) => {
     const exists = filters.domains.includes(d);

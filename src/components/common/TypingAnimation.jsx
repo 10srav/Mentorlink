@@ -3,7 +3,6 @@ import './TypingAnimation.css';
 
 const TypingAnimation = ({ texts, speed = 100, deleteSpeed = 50, delay = 2000 }) => {
   const [currentText, setCurrentText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [textIndex, setTextIndex] = useState(0);
 

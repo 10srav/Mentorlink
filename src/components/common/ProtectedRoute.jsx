@@ -1,10 +1,9 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const ProtectedRoute = ({ children, requiredRole, fallbackPath = '/login' }) => {
-  const { isAuthenticated, hasRole, loading } = useAuth();
-  const location = useLocation();
+  const { isAuthenticated, hasRole, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -20,19 +19,15 @@ const ProtectedRoute = ({ children, requiredRole, fallbackPath = '/login' }) => 
   }
 
   if (!isAuthenticated()) {
-    return <Navigate to={fallbackPath} state={{ from: location }} replace />;
+    return <Navigate to={fallbackPath} replace />;
   }
 
   if (requiredRole && !hasRole(requiredRole)) {
-    // Redirect to appropriate page based on user role
-    const userRole = location.state?.user?.role;
-    if (userRole === 'organizer') {
-      return <Navigate to="/organizer-profile" replace />;
-    } else if (userRole === 'mentor') {
-      return <Navigate to="/mentor-profile" replace />;
-    } else {
-      return <Navigate to="/home" replace />;
-    }
+    const role = user?.role;
+    if (role === 'organizer') return <Navigate to="/organizer-profile" replace />;
+    if (role === 'mentor') return <Navigate to="/mentor-profile" replace />;
+    if (role === 'student') return <Navigate to="/student-profile" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return children;

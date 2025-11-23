@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
 import logo from "../assets/mentorlink-logo.png";
 import { userAPI } from "../services/api";
+import { jwtDecode } from "jwt-decode";
 
 // Import your images here
 import img1 from "../assets/mentorlink-logo.png";
@@ -35,17 +36,21 @@ const Login = () => {
     setLoading(true);
     try {
       const data = await userAPI.login({ email, password });
-      if (data?.token) {
-        localStorage.setItem("token", data.token);
-        // Update auth context with user data
-        login(data.user);
-      }
-      // Show success popup for 5-6 seconds then navigate
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        navigate("/home");
-      }, 5500);
+      const token = data?.token;
+      if (!token) throw new Error("No token returned from server");
+
+      localStorage.setItem("token", token);
+
+      const payload = jwtDecode(token);
+      const userData = { id: payload.id, role: payload.role };
+      login(userData, token);
+
+      setShowSuccess(false);
+      const role = userData.role;
+      if (role === 'student') navigate('/student-profile');
+      else if (role === 'mentor') navigate('/mentor-profile');
+      else if (role === 'organizer') navigate('/organizer-profile');
+      else navigate('/home');
     } catch (err) {
       setError(err?.message || "Login failed");
     } finally {
@@ -72,20 +77,10 @@ const Login = () => {
           {/* Login Form Section */}
           <div className="form-section">
             <img src={logo} alt="MentorLink Logo" className="login-logo" />
-            <h2 className="welcome-text">Hey! 👋</h2>
+            <h2 className="welcome-text">Welcome Back!</h2>
             <h3 className="welcome-subtext">
               Welcome to <span className="highlight">MENTOR LINK</span>
             </h3>
-
-            {/* Use Phone Button instead of Google */}
-            <button
-              className="phone-btn"
-              onClick={() => navigate("/phone-verification")}
-            >
-              📱 Use Phone
-            </button>
-
-            <div className="divider">or</div>
 
             <form className="login-form" onSubmit={handleSubmit}>
               <div className="input-container">

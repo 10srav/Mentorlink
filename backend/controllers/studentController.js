@@ -1,6 +1,5 @@
 
 const Student = require('../models/Student');
-const User = require('../models/User');
 const fileDb = require('../utils/fileDb');
 const isFileDbEnabled = () => String(process.env.USE_FILE_DB || 'false').toLowerCase() === 'true';
 
@@ -120,7 +119,7 @@ const getStudentProfile = async (req, res) => {
     if (!student) {
       return res.status(404).json({ message: 'Student profile not found' });
     }
-
+    console.log(student)
     res.json({ student });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -160,8 +159,91 @@ const updateProfileImage = async (req, res) => {
   }
 };
 
+// @desc    Update student profile
+// @route   PUT /api/students/profile
+// @access  Private
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { goal, mentorshipField, experienceLevel, frequency, style, mentorshipTypes, portfolio } = req.body;
+
+    const student = await Student.findOne({ user: userId });
+    if (!student) {
+      return res.status(404).json({ message: 'Student profile not found' });
+    }
+
+    // Update fields
+    if (goal !== undefined) student.goal = goal;
+    if (mentorshipField !== undefined) student.mentorshipField = mentorshipField;
+    if (experienceLevel !== undefined) student.experienceLevel = experienceLevel;
+    if (frequency !== undefined) student.frequency = frequency;
+    if (style !== undefined) student.style = style;
+    if (mentorshipTypes !== undefined) student.mentorshipTypes = mentorshipTypes;
+    if (portfolio !== undefined) student.portfolio = portfolio;
+
+    await student.save();
+
+    res.json({ message: 'Profile updated successfully', student });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get all students
+// @route   GET /api/students
+// @access  Public
+const getAllStudents = async (req, res) => {
+  try {
+    if (isFileDbEnabled()) {
+      const students = fileDb.getAllStudents();
+      return res.json({ students });
+    }
+
+    const students = await Student.find()
+      .populate('user', 'name email bio profileImage location about connectionsCount')
+      .sort({ createdAt: -1 });
+
+    res.json({ students });
+  } catch (error) {
+    console.error('Error in getAllStudents:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get student by ID
+// @route   GET /api/students/:id
+// @access  Public
+const getStudentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (isFileDbEnabled()) {
+      const student = fileDb.findStudentById(id);
+      if (!student) {
+        return res.status(404).json({ message: 'Student not found' });
+      }
+      return res.json({ student });
+    }
+
+    const student = await Student.findById(id)
+      .populate('user', 'name email bio profileImage location about connectionsCount');
+
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    res.json({ student });
+  } catch (error) {
+    console.error('Error in getStudentById:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createOrUpdateStudent,
   getStudentProfile,
   updateProfileImage,
+  updateProfile,
+  getAllStudents,
+  getStudentById,
 };

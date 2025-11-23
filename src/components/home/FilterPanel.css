@@ -1,24 +1,162 @@
-.filter-panel{
-  position: sticky;
+.filter-panel {
+  position: fixed;
+  right: 0;
   top: 80px;
-  height: fit-content;
-  background:#f8fafc;
-  border-left:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:16px;
-  width: 280px;
+  height: calc(100vh - 80px);
+  background: #f8fafc;
+  border-left: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 20px;
+  width: 300px;
+  overflow-y: auto;
+  z-index: 90;
 }
-.filter-panel__title{font-weight:800;font-size:16px;margin-bottom:12px;color:#111827;display:flex;align-items:center;gap:8px}
-.filter-group{margin-bottom:16px}
-.filter-label{font-weight:700;font-size:14px;color:#374151;margin-bottom:6px;display:block}
-.filter-input{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff}
-.chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chip{background:#e5e7eb;border:none;padding:6px 10px;border-radius:999px;font-weight:600;color:#374151;cursor:pointer}
-.chip--active{background:#1e3a8a;color:#fff}
 
-/* Dark mode */
-body.dark-mode .filter-panel{background:#0f172a;border-color:#334155}
-body.dark-mode .filter-label{color:#e5e7eb}
-body.dark-mode .filter-input{background:#111827;border-color:#334155;color:#e5e7eb}
-body.dark-mode .chip{background:#334155;color:#e5e7eb}
-body.dark-mode .chip--active{background:#2563eb}
+.filter-panel__title {
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chip {
+  background: #e5e7eb;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chip:hover {
+  background: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.chip--active {
+  background: #10b981;
+  color: #fff;
+}
+
+.chip--active:hover {
+  background: #059669;
+}
+
+/* ==================== DARK MODE ==================== */
+body.dark-mode .filter-panel {
+  background: rgba(31, 41, 55, 0.8);
+  border-color: #374151;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .filter-panel__title {
+  color: #f9fafb;
+  font-weight: 700;
+}
+
+body.dark-mode .filter-label {
+  color: #e5e7eb;
+  font-weight: 600;
+}
+
+body.dark-mode .filter-input {
+  background: rgba(55, 65, 81, 0.8);
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .filter-input:focus {
+  border-color: #60a5fa;
+  background: rgba(55, 65, 81, 0.95);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+}
+
+body.dark-mode .chip {
+  background: rgba(55, 65, 81, 0.8);
+  color: #e5e7eb;
+  border: 1px solid #4b5563;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .chip:hover {
+  background: rgba(75, 85, 99, 0.9);
+  border-color: #6b7280;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .chip--active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+body.dark-mode .chip--active:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .filter-panel {
+    width: 260px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .filter-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-panel {
+    position: static;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+}

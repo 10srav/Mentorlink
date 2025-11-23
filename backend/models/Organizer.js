@@ -34,8 +34,16 @@ const organizerSchema = new mongoose.Schema({
     type: [String], // Array of strings for checkboxes
     required: true,
   },
+  profileImage: {
+    type: String,
+    default: '',
+  },
+  coverImage: {
+    type: String,
+    default: '',
+  },
 }, {
   timestamps: true,
 });
 
-module.exports = mongoose.model('Organizer', organizerSchema);
+module.exports = mongoose.models.Organizer || mongoose.model('Organizer', organizerSchema);

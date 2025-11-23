@@ -373,3 +373,117 @@
   border-color: #1e40af;
   transform: translateY(-1px);
 }
+
+/* ==================== DARK MODE ==================== */
+body.dark-mode .login-page {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+body.dark-mode .login-card {
+  background: rgba(31, 41, 55, 0.9);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+body.dark-mode .illustration-section {
+  background: rgba(17, 24, 39, 0.9);
+}
+
+body.dark-mode .image-placeholder {
+  background: rgba(55, 65, 81, 0.5);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+body.dark-mode .form-section {
+  background: rgba(31, 41, 55, 0.8);
+}
+
+body.dark-mode .login-title {
+  color: #f9fafb;
+}
+
+body.dark-mode .login-subtitle {
+  color: #d1d5db;
+}
+
+body.dark-mode .input-group label {
+  color: #e5e7eb;
+}
+
+body.dark-mode .input-wrapper input,
+body.dark-mode .input-wrapper select {
+  background: rgba(31, 41, 55, 0.6);
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .input-wrapper input::placeholder {
+  color: #9ca3af;
+}
+
+body.dark-mode .input-wrapper input:focus,
+body.dark-mode .input-wrapper select:focus {
+  border-color: #60a5fa;
+  background: rgba(31, 41, 55, 0.8);
+}
+
+body.dark-mode .toggle-password-icon {
+  color: #9ca3af;
+}
+
+body.dark-mode .toggle-password-icon:hover {
+  color: #d1d5db;
+}
+
+body.dark-mode .password-requirements {
+  background: rgba(31, 41, 55, 0.6);
+  border-color: #4b5563;
+  color: #d1d5db;
+}
+
+body.dark-mode .requirement {
+  color: #9ca3af;
+}
+
+body.dark-mode .requirement.met {
+  color: #6ee7b7;
+}
+
+body.dark-mode .forgot-password-link {
+  color: #60a5fa;
+}
+
+body.dark-mode .forgot-password-link:hover {
+  color: #93c5fd;
+}
+
+body.dark-mode .divider {
+  color: #6b7280;
+}
+
+body.dark-mode .divider::before,
+body.dark-mode .divider::after {
+  background: #4b5563;
+}
+
+body.dark-mode .social-login-btn {
+  background: rgba(31, 41, 55, 0.8);
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .social-login-btn:hover {
+  background: rgba(55, 65, 81, 0.9);
+  border-color: #6b7280;
+}
+
+body.dark-mode .signup-prompt {
+  color: #9ca3af;
+}
+
+body.dark-mode .signup-link {
+  color: #60a5fa;
+}
+
+body.dark-mode .signup-link:hover {
+  color: #93c5fd;
+}

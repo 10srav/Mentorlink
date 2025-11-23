@@ -1,3 +1,7 @@
+/* Import Professional Theme */
+@import './styles/theme.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
 /* Reset and base styles */
 * {
   margin: 0;
@@ -7,22 +11,24 @@
 
 /* Theme variables (light defaults) */
 :root {
-  --bg: #ffffff;
-  --panel: #ffffff;
-  --card-background: #ffffff;
+  --bg: #F9FAFB;
+  --panel: #FFFFFF;
+  --card-background: #FFFFFF;
   --text: #111827;
-  --muted: #6b7280;
-  --primary: #2563eb;
-  --border: #e5e7eb;
-  --success: #16a34a;
-  --danger: #dc2626;
+  --muted: #6B7280;
+  --primary: #FF8C42;
+  --border: #E5E7EB;
+  --success: #10B981;
+  --danger: #EF4444;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.6;
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
   color: var(--text);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Dark mode variables */
@@ -69,28 +75,47 @@ body.dark-mode .profile-page-container { background: var(--card-background); }
 .logo {
   font-size: 28px;
   font-weight: bold;
-  color: #2563eb;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .get-started-btn {
-  background: #2563eb;
+  background: var(--gradient-primary);
   color: white;
   padding: 10px 25px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-orange);
 }
 
 .get-started-btn:hover {
-  background: #1d4ed8;
+  background: var(--gradient-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-orange-lg);
 }
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+  background: linear-gradient(135deg, rgba(255, 140, 66, 0.1) 0%, rgba(30, 58, 138, 0.1) 100%);
   padding: 120px 0 80px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 140, 66, 0.15) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .hero-content {
@@ -116,7 +141,10 @@ body.dark-mode .profile-page-container { background: var(--card-background); }
 .typing-text {
   font-size: 28px;
   font-weight: 600;
-  color: #2563eb;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .cursor {
@@ -150,19 +178,22 @@ body.dark-mode .profile-page-container { background: var(--card-background); }
 }
 
 .explore-btn {
-  background: #2563eb;
+  background: var(--gradient-primary);
   color: white;
   padding: 15px 35px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-orange);
 }
 
 .explore-btn:hover {
-  background: #1d4ed8;
+  background: var(--gradient-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-orange-lg);
 }
 
 .image-placeholder {
@@ -287,34 +318,38 @@ body.dark-mode .profile-page-container { background: var(--card-background); }
 }
 
 .connect-btn {
-  background: #2563eb;
+  background: var(--gradient-primary);
   color: white;
   padding: 12px 30px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-orange);
 }
 
 .connect-btn:hover {
-  background: #1d4ed8;
+  background: var(--gradient-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-orange-lg);
 }
 
 .try-btn {
   background: transparent;
-  color: #2563eb;
-  border: 2px solid #2563eb;
+  color: var(--primary-orange);
+  border: 2px solid var(--primary-orange);
   padding: 12px 30px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-base);
 }
 
 .try-btn:hover {
-  background: #2563eb;
+  background: var(--primary-orange);
   color: white;
+  transform: translateY(-2px);
 }
 
 /* Testimonials Section */
@@ -371,7 +406,7 @@ body.dark-mode .profile-page-container { background: var(--card-background); }
 /* Contact Section */
 .contact {
   padding: 80px 0;
-  background: #2563eb;
+  background: var(--gradient-secondary);
   color: white;
   text-align: center;
 }
@@ -396,18 +431,21 @@ body.dark-mode .profile-page-container { background: var(--card-background); }
 
 .contact-btn {
   background: white;
-  color: #2563eb;
+  color: var(--navy-blue);
   padding: 15px 40px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
 }
 
 .contact-btn:hover {
-  background: #f0f0f0;
+  background: var(--gray-100);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
 }
 
 /* Final CTA Section */
@@ -437,35 +475,40 @@ body.dark-mode .profile-page-container { background: var(--card-background); }
 }
 
 .student-btn {
-  background: #2563eb;
+  background: var(--gradient-secondary);
   color: white;
   padding: 15px 35px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-blue);
 }
 
 .student-btn:hover {
-  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .mentor-btn {
-  background: #059669;
+  background: var(--gradient-primary);
   color: white;
   padding: 15px 35px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-orange);
 }
 
 .mentor-btn:hover {
-  background: #047857;
+  background: var(--gradient-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-orange-lg);
 }
 
 /* Responsive Design */

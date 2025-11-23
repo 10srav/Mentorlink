@@ -104,7 +104,7 @@ const Feedback = () => {
       <div className="feedback-container">
         {/* Section Header */}
         <div className={`feedback-header ${isVisible ? 'animate-in' : ''}`}>
-          <h2 className="feedback-title">Our User Feed Back</h2>
+          <h2 className="feedback-title">Our User Feedback</h2>
         </div>
 
         {/* Scrolling Testimonials Container */}
@@ -114,9 +114,7 @@ const Feedback = () => {
               {/* First set of testimonials */}
               {testimonials.map((testimonial) => (
                 <div key={`first-${testimonial.id}`} className="testimonial-card">
-                  <div className="testimonial-content">
-                    <p className="testimonial-text">"{testimonial.text}"</p>
-                  </div>
+                  {/* Author info first */}
                   <div className="testimonial-author">
                     <div className="author-avatar">
                       <span className="avatar-emoji">{testimonial.avatar}</span>
@@ -125,15 +123,17 @@ const Feedback = () => {
                       <h4 className="author-name">{testimonial.author}</h4>
                       <p className="author-role">{testimonial.role}</p>
                     </div>
+                  </div>
+
+                  {/* Feedback text below */}
+                  <div className="testimonial-content">
+                    <p className="testimonial-text">"{testimonial.text}"</p>
                   </div>
                 </div>
               ))}
               {/* Duplicate set for seamless loop */}
               {testimonials.map((testimonial) => (
                 <div key={`second-${testimonial.id}`} className="testimonial-card">
-                  <div className="testimonial-content">
-                    <p className="testimonial-text">"{testimonial.text}"</p>
-                  </div>
                   <div className="testimonial-author">
                     <div className="author-avatar">
                       <span className="avatar-emoji">{testimonial.avatar}</span>
@@ -142,6 +142,9 @@ const Feedback = () => {
                       <h4 className="author-name">{testimonial.author}</h4>
                       <p className="author-role">{testimonial.role}</p>
                     </div>
+                  </div>
+                  <div className="testimonial-content">
+                    <p className="testimonial-text">"{testimonial.text}"</p>
                   </div>
                 </div>
               ))}

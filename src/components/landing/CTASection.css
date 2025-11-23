@@ -117,11 +117,11 @@
 
 /* Dark Mode */
 body.dark-mode .cta-section {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
 }
 
 body.dark-mode .cta-title {
-  color: #e9ecef;
+  color: #93c5fd;
 }
 
 body.dark-mode .cta-typing-container,

@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { userAPI } from '../services/api';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -15,44 +17,37 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ On app load, rehydrate user from localStorage via jwt-decode
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
-      // Decode token to get user info (basic implementation)
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = jwtDecode(token);
         setUser({
           id: payload.id,
-          role: payload.role || 'student', // Default role if not in token
+          role: payload.role,
         });
       } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('token');
+        console.error("Error decoding token:", error);
+        localStorage.removeItem("token");
       }
     }
     setLoading(false);
   }, []);
 
-  const login = (userData) => {
+  const login = (userData, token) => {
+    if (token) localStorage.setItem("token", token);
     setUser(userData);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
   };
 
-  const isAuthenticated = () => {
-    return !!user && !!localStorage.getItem('token');
-  };
+  const isAuthenticated = () => !!user && !!localStorage.getItem("token");
 
-  const hasRole = (role) => {
-    return user?.role === role;
-  };
-
-  const isStudent = () => hasRole('student');
-  const isMentor = () => hasRole('mentor');
-  const isOrganizer = () => hasRole('organizer');
+  const hasRole = (role) => user?.role === role;
 
   const value = {
     user,
@@ -61,14 +56,31 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAuthenticated,
     hasRole,
-    isStudent,
-    isMentor,
-    isOrganizer,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {/* ✅ Don’t render children until loading is complete */}
+      {loading ? <div>Loading...</div> : children}
     </AuthContext.Provider>
   );
+};
+
+// ✅ Role-based profile redirect
+export const ProfileRedirect = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to="/login" />;
+
+  switch (user.role) {
+    case "student":
+      return <Navigate to="/student-profile" />;
+    case "mentor":
+      return <Navigate to="/mentor-profile" />;
+    case "organizer":
+      return <Navigate to="/organizer-profile" />;
+    default:
+      return <div>Invalid role</div>;
+  }
 };

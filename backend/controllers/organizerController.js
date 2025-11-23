@@ -1,4 +1,7 @@
+/* eslint-env node */
+/* eslint-disable no-undef */
 const Organizer = require('../models/organizer');
+const { upload, uploadToCloudinary } = require('../middleware/upload');
 
 // @desc    Create or update organizer profile
 // @route   POST /api/organizers
@@ -55,4 +58,149 @@ const createOrUpdateOrganizer = async (req, res) => {
   }
 };
 
-module.exports = { createOrUpdateOrganizer };
+// @desc    Get organizer profile for current user
+// @route   GET /api/organizers/profile
+// @access  Private
+const getOrganizerProfile = async (req, res) => {
+  try {
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const organizer = await Organizer.findOne({ user: userId }).populate('user', 'name email bio');
+    if (!organizer) {
+      return res.status(404).json({ message: 'Organizer profile not found' });
+    }
+
+    res.json({ organizer });
+  } catch (error) {
+    console.error('getOrganizerProfile error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Upload profile image to Cloudinary
+// @route   POST /api/organizers/upload-profile-image
+// @access  Private
+const uploadProfileImage = async (req, res) => {
+  try {
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    if (!req.cloudinaryResult) {
+      return res.status(400).json({ message: 'No image uploaded' });
+    }
+
+    // Update organizer profile with new image URL
+    const organizer = await Organizer.findOneAndUpdate(
+      { user: userId },
+      { profileImage: req.cloudinaryResult.secure_url },
+      { new: true }
+    );
+
+    if (!organizer) {
+      return res.status(404).json({ message: 'Organizer profile not found' });
+    }
+
+    res.json({
+      message: 'Profile image uploaded successfully',
+      imageUrl: req.cloudinaryResult.secure_url,
+      organizer
+    });
+  } catch (error) {
+    console.error('uploadProfileImage error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Upload cover image to Cloudinary
+// @route   POST /api/organizers/upload-cover-image
+// @access  Private
+const uploadCoverImage = async (req, res) => {
+  try {
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    if (!req.cloudinaryResult) {
+      return res.status(400).json({ message: 'No image uploaded' });
+    }
+
+    // Update organizer profile with new cover image URL
+    const organizer = await Organizer.findOneAndUpdate(
+      { user: userId },
+      { coverImage: req.cloudinaryResult.secure_url },
+      { new: true }
+    );
+
+    if (!organizer) {
+      return res.status(404).json({ message: 'Organizer profile not found' });
+    }
+
+    res.json({
+      message: 'Cover image uploaded successfully',
+      imageUrl: req.cloudinaryResult.secure_url,
+      organizer
+    });
+  } catch (error) {
+    console.error('uploadCoverImage error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Update organizer profile
+// @route   PUT /api/organizers/profile
+// @access  Private
+const updateOrganizerProfile = async (req, res) => {
+  try {
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const {
+      domains,
+      motivation,
+      audience,
+      eventTypes
+    } = req.body;
+
+    const updateFields = {};
+    if (domains) updateFields.domains = domains;
+    if (motivation) updateFields.motivation = motivation;
+    if (audience) updateFields.audience = audience;
+    if (eventTypes) updateFields.eventTypes = eventTypes;
+
+    const organizer = await Organizer.findOneAndUpdate(
+      { user: userId },
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    ).populate('user', 'name email');
+
+    if (!organizer) {
+      return res.status(404).json({ message: 'Organizer profile not found' });
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      organizer
+    });
+  } catch (error) {
+    console.error('updateOrganizerProfile error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = {
+  createOrUpdateOrganizer,
+  getOrganizerProfile,
+  uploadProfileImage,
+  uploadCoverImage,
+  updateOrganizerProfile,
+  upload,
+  uploadToCloudinary
+};

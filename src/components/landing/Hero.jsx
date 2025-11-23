@@ -15,7 +15,6 @@ const Hero = () => {
 
   return (
     <section className="hero" id="hero">
-      <div className="hero-bg"></div>
       
       <div className="hero-container">
         <div className="hero-content">

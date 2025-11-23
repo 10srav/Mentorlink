@@ -16,10 +16,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  mobile: {
-    type: String,
-    required: true,
-  },
   bio: {
     type: String,
     required: true,
@@ -48,6 +44,40 @@ const userSchema = new mongoose.Schema({
   otpExpires: {
     type: Date,
   },
+  connections: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
+  connectionsCount: {
+    type: Number,
+    default: 0,
+  },
+  profileImage: {
+    type: String,
+  },
+  location: {
+    type: String,
+  },
+  about: {
+    type: String,
+  },
+  // Follow system
+  followers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
+  following: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
+  followersCount: {
+    type: Number,
+    default: 0,
+  },
+  followingCount: {
+    type: Number,
+    default: 0,
+  },
 }, {
   timestamps: true,
 });
@@ -66,4 +96,4 @@ userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);

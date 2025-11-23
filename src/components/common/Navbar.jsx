@@ -1,31 +1,34 @@
-import { useNavigate } from "react-router-dom";   // ✅ add this
-import React, { useState } from 'react';
-import './Navbar.css';
-import logoImage from '../../assets/mentorlink-logo.png';
+import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { FiMoon, FiSun } from "react-icons/fi";
+import "./Navbar.css";
+import logoImage from "../../assets/mentorlink-logo.png";
 
 const Navbar = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isThreadPulled, setIsThreadPulled] = useState(false);
-  const navigate = useNavigate();                 // ✅ add this
+  const [dark, setDark] = useState(false);
+  const navigate = useNavigate();
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.toggle('dark-mode');
-  };
+  // Load saved theme
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const isDark = savedTheme === "dark";
+    setDark(isDark);
+    document.body.classList.toggle("dark-mode", isDark);
+  }, []);
 
-  const handleThreadPull = () => {
-    setIsThreadPulled(true);
-    setTimeout(() => {
-      toggleDarkMode();
-      setIsThreadPulled(false);
-    }, 800);
+  // Toggle theme
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    document.body.classList.toggle("dark-mode", next);
+    localStorage.setItem("theme", next ? "dark" : "light");
   };
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
         {/* Logo Section */}
-        <div className="navbar-logo">
+        <div className="navbar-logo" onClick={() => navigate("/home")}>
           <img src={logoImage} alt="MentorLink Logo" className="logo-image" />
         </div>
 
@@ -37,24 +40,21 @@ const Navbar = () => {
             <a href="#contact" className="nav-link">Contact</a>
           </div>
 
-          {/* ✅ Just added onClick to navigate */}
           <button 
-            className="get-started-btn typing-animation"
+            className="get-started-btn"
             onClick={() => navigate("/login")}
           >
             Get Started
           </button>
 
-          {/* Dark Mode Thread Toggle */}
-          <div
-            className={`thread-toggle ${isThreadPulled ? 'pulled' : ''}`}
-            onClick={handleThreadPull}
+          {/* Dark Mode Toggle */}
+          <button
+            className="theme-toggle-square"
+            onClick={toggleDark}
+            aria-label="Toggle dark mode"
           >
-            <div className="thread-line"></div>
-            <div className="thread-handle">
-              <span className="thread-icon">{isDarkMode ? '☀️' : '🌙'}</span>
-            </div>
-          </div>
+            {dark ? <FiSun size={20} /> : <FiMoon size={20} />}
+          </button>
         </div>
       </div>
     </nav>

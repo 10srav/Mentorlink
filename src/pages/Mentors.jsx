@@ -1,187 +1,365 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HomeNavbar from '../components/common/HomeNavbar';
 import Sidebar from '../components/home/Sidebar';
 import FilterPanel from '../components/home/FilterPanel';
 import MentorCard from '../components/home/MentorCard';
+import Footer from '../components/common/Footer';
+import { mentorAPI } from '../services/api';
 import './Mentors.css';
 
 const Mentors = () => {
-  // Temporary mock data (similar to HomePage)
-  const mockMentors = useMemo(() => ([
-    {
-      id: 1,
-      name: 'Vivek Sridhar',
-      verified: true,
-      title: 'CTO - Microsoft For Startups',
-      company: 'Microsoft',
-      experience: 18,
-      sessions: 10,
-      rating: 4.5,
-      avatar: 'https://i.pravatar.cc/100?img=12',
-      bio: 'Vivek is a technophile and an Open Source contributor with 18+ years in software industry. Worked at Microsoft as CTO-Microsoft for startups.',
-      skills: ['Javascript','Flutter','Node JS','React','Python','React Native','DevOps','Cloud','Leadership'],
-      coreDomain: 'Interview Preparation',
-      domains: ['Tech Mentor','Startup Mentor'],
-    },
-    {
-      id: 2,
-      name: 'Priyanka Taneja',
-      verified: true,
-      title: 'CTO - Microsoft For Startups',
-      company: 'Microsoft',
-      experience: 15,
-      sessions: 9,
-      rating: 4.0,
-      avatar: 'https://i.pravatar.cc/100?img=32',
-      bio: 'Priyanka is an Open Source contributor with 15+ years of experience and has worked at Microsoft in previous roles.',
-      skills: ['Javascript','Kotlin','Node JS','React','Python','React Native'],
-      coreDomain: 'System Design',
-      domains: ['Professor in experiences','UI/UX Developer'],
-    },
-    {
-      id: 3,
-      name: 'Rahul Verma',
-      verified: false,
-      title: 'Senior Engineer',
-      company: 'Google',
-      experience: 10,
-      sessions: 20,
-      rating: 4.8,
-      avatar: 'https://i.pravatar.cc/100?img=5',
-      bio: 'Rahul specializes in scalable systems, cloud architecture and interview coaching.',
-      skills: ['Golang','System Design','Kubernetes','GCP','React'],
-      coreDomain: 'Backend Architecture',
-      domains: ['Tech Mentor'],
-    },
-  ]), []);
-
-  const addMore = (n = 6) => {
-    const templates = [
-      {
-        name: 'Ananya Rao', verified: true, title: 'Staff Engineer', company: 'Microsoft', experience: 12,
-        bio: 'Staff Engineer with expertise in distributed systems and mentorship.',
-        skills: ['C#','Azure','System Design','React','Node JS'], coreDomain: 'System Design', domains: ['Tech Mentor']
-      },
-      {
-        name: 'Rohit Kumar', verified: false, title: 'SDE III', company: 'Amazon', experience: 9,
-        bio: 'Passionate about backend engineering and interview preparation.',
-        skills: ['Java','Microservices','AWS','DSA','Spring'], coreDomain: 'Backend Architecture', domains: ['Tech Mentor','Startup Mentor']
-      },
-      {
-        name: 'Sneha Patel', verified: true, title: 'Product Designer', company: 'Adobe', experience: 8,
-        bio: 'Design lead focusing on accessible UI/UX and design systems.',
-        skills: ['Figma','UX','UI','Design Systems','Prototyping'], coreDomain: 'UI/UX', domains: ['UI/UX Developer']
-      },
-    ];
-    const next = Array.from({ length: n }).map((_, idx) => {
-      const t = templates[(idx + mentors.length) % templates.length];
-      return {
-        id: mentors.length + idx + 1,
-        avatar: `https://i.pravatar.cc/100?img=${(mentors.length + idx) % 70}`,
-        sessions: Math.floor(Math.random() * 20) + 5,
-        rating: Math.round((Math.random() * 1 + 4) * 10) / 10,
-        ...t,
-      };
-    });
-    setMentors((prev) => [...prev, ...next]);
-  };
-
-  const [mentors, setMentors] = useState(mockMentors);
+  const navigate = useNavigate();
+  const [mentors, setMentors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   const [filters, setFilters] = useState({
     query: '',
-    sort: 'experience',
+    sort: 'experience-desc',
     domains: [],
     companies: [],
   });
 
+  // Fetch mentors from API with pagination
+  const fetchMentors = async (pageNum = 1, append = false) => {
+    try {
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
+      const params = {
+        page: pageNum,
+        limit: 12,
+        search: filters.query || undefined,
+        sort: filters.sort || undefined,
+      };
+
+      const response = await mentorAPI.getAllMentors(params);
+
+      const newMentors = response.mentors || [];
+      const total = response.total || newMentors.length;
+      const currentPage = response.page || pageNum;
+      const limit = response.limit || 12;
+
+      if (append) {
+        setMentors(prev => [...prev, ...newMentors]);
+      } else {
+        setMentors(newMentors);
+      }
+
+      setTotalCount(total);
+      setHasMore(newMentors.length === limit && mentors.length + newMentors.length < total);
+      setPage(currentPage);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching mentors:', err);
+      setError(err.message || 'Failed to load mentors');
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    fetchMentors(1, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Refetch when search or sort changes
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (!loading) {
+        setPage(1);
+        fetchMentors(1, false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.query, filters.sort]);
+
+  // Load more mentors
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      const nextPage = page + 1;
+      fetchMentors(nextPage, true);
+    }
+  };
+
+  // Client-side filtering for domains and companies
   const filtered = useMemo(() => {
     let list = [...mentors];
-    const q = filters.query.trim().toLowerCase();
-    if (q) {
-      list = list.filter(m =>
-        m.name.toLowerCase().includes(q) ||
-        (m.title || '').toLowerCase().includes(q) ||
-        (m.skills || []).some(s => s.toLowerCase().includes(q))
-      );
+
+    // Filter by domains
+    if (filters.domains.length > 0) {
+      list = list.filter(m => {
+        const mentorDomains = [
+          m.primaryDomain,
+          m.secondaryDomain,
+          ...(m.domains || [])
+        ].filter(Boolean);
+
+        return filters.domains.some(d =>
+          mentorDomains.some(md => md && md.toLowerCase().includes(d.toLowerCase()))
+        );
+      });
     }
-    if (filters.domains.length) {
-      list = list.filter(m => m.domains?.some(d => filters.domains.includes(d)));
+
+    // Filter by companies
+    if (filters.companies.length > 0) {
+      list = list.filter(m => {
+        const company = m.company || '';
+        return filters.companies.includes(company);
+      });
     }
-    if (filters.companies.length) {
-      list = list.filter(m => filters.companies.includes(m.company));
+
+    // Client-side sort (in case backend doesn't support it)
+    if (filters.sort) {
+      if (filters.sort === 'recent') {
+        // Recently joined - sort by ID descending (assuming higher ID = more recent)
+        list.sort((a, b) => {
+          const idA = a._id || a.id || 0;
+          const idB = b._id || b.id || 0;
+          return String(idB).localeCompare(String(idA));
+        });
+      } else {
+        const [field, order] = filters.sort.split('-');
+
+        list.sort((a, b) => {
+          let aVal, bVal;
+
+          switch (field) {
+            case 'experience': {
+              const getExp = (m) => {
+                const exp = m.primaryExperience || m.experience || '0';
+                const match = String(exp).match(/\d+/);
+                return match ? parseInt(match[0]) : 0;
+              };
+              aVal = getExp(a);
+              bVal = getExp(b);
+              break;
+            }
+            case 'followers':
+              aVal = a.user?.followersCount || a.followersCount || 0;
+              bVal = b.user?.followersCount || b.followersCount || 0;
+              break;
+            case 'mentees':
+              aVal = a.menteesCount || a.activeMentees?.length || 0;
+              bVal = b.menteesCount || b.activeMentees?.length || 0;
+              break;
+            case 'name': {
+              const nameA = a.user?.name || a.name || '';
+              const nameB = b.user?.name || b.name || '';
+              return order === 'asc'
+                ? nameA.localeCompare(nameB)
+                : nameB.localeCompare(nameA);
+            }
+            default:
+              return 0;
+          }
+
+          return order === 'desc' ? bVal - aVal : aVal - bVal;
+        });
+      }
     }
-    if (filters.sort === 'experience') {
-      list.sort((a,b) => (b.experience || 0) - (a.experience || 0));
-    }
+
     return list;
   }, [mentors, filters]);
 
-  const testimonials = useMemo(() => ([
-    { id: 't1', text: 'MentorLink connected me with an industry expert who helped me land my dream job at Google. The guidance was practical and personalized.', author: 'Amit Verma', company: 'Google', avatar: 'https://i.pravatar.cc/100?img=31' },
-    { id: 't2', text: 'The mentorship sessions boosted my confidence and skills. I highly recommend MentorLink to anyone looking to grow.', author: 'Priya Singh', company: 'Amazon', avatar: 'https://i.pravatar.cc/100?img=32' },
-    { id: 't3', text: 'My mentor helped me navigate a career switch into UX design. The advice and resources were invaluable.', author: 'Rohit Patel', company: 'Adobe', avatar: 'https://i.pravatar.cc/100?img=33' },
-    { id: 't4', text: 'I loved the interactive sessions and real-world insights. MentorLink is a game changer for students.', author: 'Sneha Rao', company: 'Microsoft', avatar: 'https://i.pravatar.cc/100?img=34' },
-  ]), []);
+  // Extract unique domains and companies from fetched mentors for FilterPanel
+  const availableDomains = useMemo(() => {
+    const domainsSet = new Set();
+    mentors.forEach(m => {
+      if (m.primaryDomain) domainsSet.add(m.primaryDomain);
+      if (m.secondaryDomain) domainsSet.add(m.secondaryDomain);
+      if (m.domains && Array.isArray(m.domains)) {
+        m.domains.forEach(d => domainsSet.add(d));
+      }
+    });
+    return Array.from(domainsSet).sort();
+  }, [mentors]);
+
+  const availableCompanies = useMemo(() => {
+    const companiesSet = new Set();
+    mentors.forEach(m => {
+      if (m.company) companiesSet.add(m.company);
+    });
+    return Array.from(companiesSet).sort();
+  }, [mentors]);
+
+  // Loading skeleton
+  const renderSkeletonCards = (count = 6) => {
+    return Array.from({ length: count }).map((_, idx) => (
+      <div key={`skeleton-${idx}`} className="mentor-card-skeleton">
+        <div className="skeleton-header">
+          <div className="skeleton-avatar"></div>
+          <div className="skeleton-text-group">
+            <div className="skeleton-line skeleton-line-title"></div>
+            <div className="skeleton-line skeleton-line-subtitle"></div>
+          </div>
+        </div>
+        <div className="skeleton-line skeleton-line-bio"></div>
+        <div className="skeleton-line skeleton-line-bio short"></div>
+        <div className="skeleton-stats">
+          <div className="skeleton-stat"></div>
+          <div className="skeleton-stat"></div>
+        </div>
+        <div className="skeleton-buttons">
+          <div className="skeleton-button"></div>
+          <div className="skeleton-button"></div>
+        </div>
+      </div>
+    ));
+  };
 
   return (
     <>
       <HomeNavbar />
-      <div className="home-layout">
-        <Sidebar />
+      <div className="mentors-page-wrapper">
+        <div className="home-layout">
+          <Sidebar />
 
-        <main className="home-main">
-          <div className="main-header">
-            <div className="title">Our Mentors</div>
-            <p className="subtitle">Discover the latest additions to our Mentors community! Meet the fresh faces ready to guide and inspire you on your journey</p>
-          </div>
-
-          <div className="toolbar">
-            <input
-              className="search"
-              placeholder="Search here..."
-              value={filters.query}
-              onChange={(e) => setFilters({ ...filters, query: e.target.value })}
-            />
-            <select
-              className="sort"
-              value={filters.sort}
-              onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
-            >
-              <option value="experience">Sort By: Experience</option>
-            </select>
-          </div>
-
-          <div className="cards">
-            {filtered.map((m) => (
-              <MentorCard key={m.id} mentor={m} />
-            ))}
-          </div>
-
-          <div className="see-more-wrap">
-            <button className="see-more" onClick={() => addMore(6)}>See more ▸</button>
-          </div>
-
-          <section className="testimonials">
-            <div className="title">Testimonials</div>
-            <div className="testimonial-scroll">
-              {testimonials.map((t) => (
-                <div key={t.id} className="testimonial-card">
-                  <div className="testimonial-text">{t.text}</div>
-                  <div className="author">
-                    <img src={t.avatar} alt={t.author} />
-                    <div>
-                      <div>{t.author}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280' }}>{t.company}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          <main className="home-main">
+            <div className="main-header">
+              <div className="title">Our Mentors</div>
+              <p className="subtitle">
+                Discover the latest additions to our Mentors community! Meet the fresh faces ready to guide and inspire you on your journey
+              </p>
             </div>
-          </section>
-        </main>
 
-        <FilterPanel filters={filters} setFilters={setFilters} />
+            <div className="toolbar">
+              <input
+                className="search"
+                placeholder="Search by name, role, or skills..."
+                value={filters.query}
+                onChange={(e) => setFilters({ ...filters, query: e.target.value })}
+              />
+              <select
+                className="sort"
+                value={filters.sort}
+                onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
+              >
+                <option value="experience-desc">Sort By: Experience (High to Low)</option>
+                <option value="experience-asc">Sort By: Experience (Low to High)</option>
+                <option value="followers-desc">Sort By: Followers (High to Low)</option>
+                <option value="followers-asc">Sort By: Followers (Low to High)</option>
+                <option value="mentees-desc">Sort By: Mentees (High to Low)</option>
+                <option value="mentees-asc">Sort By: Mentees (Low to High)</option>
+                <option value="name-asc">Sort By: Name (A-Z)</option>
+                <option value="name-desc">Sort By: Name (Z-A)</option>
+                <option value="recent">Sort By: Recently Joined</option>
+              </select>
+            </div>
+
+            {/* Results count */}
+            {!loading && (
+              <div className="results-count">
+                Showing {filtered.length} of {totalCount} mentors
+              </div>
+            )}
+
+            <div className="cards">
+              {loading && !loadingMore ? (
+                renderSkeletonCards(6)
+              ) : error && mentors.length === 0 ? (
+                <div className="error-message-box">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  <h3>Failed to load mentors</h3>
+                  <p>{error}</p>
+                  <button className="retry-btn" onClick={() => fetchMentors(1, false)}>
+                    Retry
+                  </button>
+                </div>
+              ) : filtered.length > 0 ? (
+                filtered.map((m) => (
+                  <MentorCard
+                    key={m._id || m.id}
+                    mentor={m}
+                    onClick={() => {
+                      if (m._id) {
+                        navigate(`/mentors/${m._id}`);
+                      } else {
+                        console.error('Mentor ID is missing:', m);
+                        alert('Unable to view this mentor profile - ID is missing');
+                      }
+                    }}
+                  />
+                ))
+              ) : (
+                <div className="no-results-box">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                  </svg>
+                  <h3>No mentors found</h3>
+                  <p>
+                    {filters.query || filters.domains.length > 0 || filters.companies.length > 0
+                      ? 'Try adjusting your filters or search query'
+                      : 'No mentors have registered yet'}
+                  </p>
+                  {(filters.query || filters.domains.length > 0 || filters.companies.length > 0) && (
+                    <button
+                      className="clear-filters-btn"
+                      onClick={() => setFilters({ query: '', sort: 'experience-desc', domains: [], companies: [] })}
+                    >
+                      Clear All Filters
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Loading more skeletons */}
+            {loadingMore && (
+              <div className="cards">
+                {renderSkeletonCards(6)}
+              </div>
+            )}
+
+            {/* See More Button */}
+            {!loading && hasMore && filtered.length > 0 && (
+              <div className="see-more-wrap">
+                <button
+                  className="see-more"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? 'Loading...' : `See More (${totalCount - filtered.length} remaining)`} ▸
+                </button>
+              </div>
+            )}
+
+            {/* End of results message */}
+            {!loading && !hasMore && mentors.length > 0 && (
+              <div className="end-of-results">
+                <p>You've reached the end of the list</p>
+              </div>
+            )}
+          </main>
+
+          <FilterPanel
+            filters={filters}
+            setFilters={setFilters}
+            availableDomains={availableDomains}
+            availableCompanies={availableCompanies}
+          />
+        </div>
+
+        {/* Footer outside of home-layout for full-width */}
+        <Footer />
       </div>
     </>
   );
